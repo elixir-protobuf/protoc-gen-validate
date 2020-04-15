@@ -7,6 +7,7 @@ defmodule ProtoValidator.MixProject do
       version: "0.1.0",
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
+      escript: escript(),
       deps: deps()
     ]
   end
@@ -18,12 +19,14 @@ defmodule ProtoValidator.MixProject do
     ]
   end
 
+  defp escript do
+    [main_module: ProtoValidator.Protoc.CLI, name: "protoc-gen-validate"]
+  end
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:protobuf, "~> 0.8.0-beta"}
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:protobuf, github: "tony612/protobuf-elixir", branch: "refactor-protoc"}
     ]
   end
 end

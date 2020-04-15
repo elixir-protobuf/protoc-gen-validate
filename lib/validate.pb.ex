@@ -9,6 +9,7 @@ defmodule Validate.FieldRules do
   defstruct [:type, :message]
 
   oneof :type, 0
+
   field :message, 17, optional: true, type: Validate.MessageRules
   field :uint64, 6, optional: true, type: Validate.UInt64Rules, oneof: 0
 end
@@ -35,4 +36,11 @@ defmodule Validate.UInt64Rules do
   defstruct [:gt]
 
   field :gt, 4, optional: true, type: :uint64
+end
+
+defmodule Validate.PbExtension do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  extend Google.Protobuf.FieldOptions, :rules, 1071, optional: true, type: Validate.FieldRules
 end
