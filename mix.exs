@@ -1,9 +1,9 @@
-defmodule ProtocGenValidate.MixProject do
+defmodule ProtoValidator.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :protoc_gen_validate,
+      app: :proto_validator,
       version: "0.1.0",
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
