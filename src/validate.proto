@@ -1,0 +1,32 @@
+syntax = "proto2";
+package validate;
+
+import "google/protobuf/descriptor.proto";
+
+// Validation rules applied at the field level
+extend google.protobuf.FieldOptions {
+    // Rules specify the validations to be performed on this field. By default,
+    // no validation is performed against a field.
+    optional FieldRules rules = 1071;
+}
+
+message FieldRules {
+    optional MessageRules message = 17;
+    oneof type {
+        // Scalar Field Types
+        UInt64Rules   uint64   = 6;
+    }
+}
+
+message MessageRules {
+    // Required specifies that this field must be set
+    optional bool required = 2;
+}
+
+// UInt64Rules describes the constraints applied to `uint64` values
+message UInt64Rules {
+    // Gt specifies that this field must be greater than the specified value,
+    // exclusive. If the value of Gt is larger than a specified Lt or Lte, the
+    // range is reversed.
+    optional uint64 gt = 4;
+}
