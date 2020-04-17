@@ -26,7 +26,8 @@ defmodule ProtoValidator.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:protobuf, github: "tony612/protobuf-elixir", branch: "refactor-protoc"}
+      {:protobuf, github: "tony612/protobuf-elixir", branch: "refactor-protoc"},
+      {:vex, "~> 0.8.0"}
     ]
   end
 end

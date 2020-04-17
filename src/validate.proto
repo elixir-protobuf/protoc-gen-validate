@@ -25,6 +25,9 @@ message MessageRules {
 
 // UInt64Rules describes the constraints applied to `uint64` values
 message UInt64Rules {
+    // Lt specifies that this field must be less than the specified value,
+    // exclusive
+    optional uint64 lt = 2;
     // Gt specifies that this field must be greater than the specified value,
     // exclusive. If the value of Gt is larger than a specified Lt or Lte, the
     // range is reversed.

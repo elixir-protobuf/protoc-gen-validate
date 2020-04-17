@@ -1,0 +1,7 @@
+defmodule <%= name %> do
+  @moduledoc false
+  use ProtoValidator<%= options %>
+
+<%= for f <- fields do %>  validate <%= f %>
+<% end %>
+end

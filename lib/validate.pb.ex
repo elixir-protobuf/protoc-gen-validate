@@ -8,10 +8,10 @@ defmodule Validate.FieldRules do
         }
   defstruct [:type, :message]
 
-  oneof :type, 0
+  oneof(:type, 0)
 
-  field :message, 17, optional: true, type: Validate.MessageRules
-  field :uint64, 6, optional: true, type: Validate.UInt64Rules, oneof: 0
+  field(:message, 17, optional: true, type: Validate.MessageRules)
+  field(:uint64, 6, optional: true, type: Validate.UInt64Rules, oneof: 0)
 end
 
 defmodule Validate.MessageRules do
@@ -23,7 +23,7 @@ defmodule Validate.MessageRules do
         }
   defstruct [:required]
 
-  field :required, 2, optional: true, type: :bool
+  field(:required, 2, optional: true, type: :bool)
 end
 
 defmodule Validate.UInt64Rules do
@@ -31,16 +31,18 @@ defmodule Validate.UInt64Rules do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
+          lt: non_neg_integer,
           gt: non_neg_integer
         }
-  defstruct [:gt]
+  defstruct [:lt, :gt]
 
-  field :gt, 4, optional: true, type: :uint64
+  field(:lt, 2, optional: true, type: :uint64)
+  field(:gt, 4, optional: true, type: :uint64)
 end
 
 defmodule Validate.PbExtension do
   @moduledoc false
   use Protobuf, syntax: :proto2
 
-  extend Google.Protobuf.FieldOptions, :rules, 1071, optional: true, type: Validate.FieldRules
+  extend(Google.Protobuf.FieldOptions, :rules, 1071, optional: true, type: Validate.FieldRules)
 end

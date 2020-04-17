@@ -5,6 +5,24 @@ package examplepb;
 import "validate.proto";
 
 message User {
-  uint64 id    = 1 [(validate.rules).uint64.gt    = 0];
+  // uint64 id    = 1 [(validate.rules).uint64.gt    = 0, (validate.rules).message.required = true];
+  uint64 id    = 1 [(validate.rules) = {
+    uint64: {gt: 0, lt: 90},
+    message: {required: true}
+  }];
   string email = 2 [(validate.rules).message.required = true];
+
+  enum GENDER {
+    MALE = 0;
+    FEMALE = 1;
+    OTHER = 2;
+  }
+
+  GENDER gender = 3;
+
+  message Phone {
+    string phone_number = 1;
+  }
+
+  Phone phone = 4;
 }

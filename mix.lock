@@ -1,3 +1,4 @@
 %{
   "protobuf": {:git, "https://github.com/tony612/protobuf-elixir.git", "b7f99dec1ba08090f39aa54edd25915efe2bf076", [branch: "refactor-protoc"]},
+  "vex": {:hex, :vex, "0.8.0", "0a04e3aebe5ec443525c88f3833b4481d97de272f891243b62b18efbda85b121", [:mix], [], "hexpm", "36a37f264b36fe4b0430c9f174d71c59845cf56d9e2ae32960038432b16961ea"},
 }
