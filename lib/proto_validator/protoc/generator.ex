@@ -74,25 +74,25 @@ defmodule ProtoValidator.Protoc.Generator do
   defp gen_validation([]), do: nil
 
   defp gen_validation(validations) do
-    # :id, required: true, gt: 0, lt: 90
     Enum.map(validations, fn {name, %Validate.FieldRules{message: message, type: type}} ->
       message_rule_str_list = get_rule_str_list(message)
       type_rule_str_list = get_rule_str_list(type)
-
-      rules_str =
-        message_rule_str_list
-        |> Kernel.++(type_rule_str_list)
-        |> Enum.join(", ")
+      rules_str = "#{message_rule_str_list}#{type_rule_str_list}"
 
       ":#{name}, #{rules_str}"
     end)
   end
 
-  defp get_rule_str_list(nil), do: []
+  defp get_rule_str_list(nil), do: nil
 
-  defp get_rule_str_list({_type, type_rules}), do: get_rule_str_list(type_rules)
+  defp get_rule_str_list({type, type_rules}) do
+    ", #{type}: [#{get_rule_str_list(type_rules)}]"
+  end
 
   defp get_rule_str_list(rules) do
-    rules |> Map.from_struct() |> Enum.map(fn {k, v} -> "#{k}: #{v}" end)
+    rules
+    |> Map.from_struct()
+    |> Enum.map(fn {k, v} -> "#{k}: #{v}" end)
+    |> Enum.join(", ")
   end
 end

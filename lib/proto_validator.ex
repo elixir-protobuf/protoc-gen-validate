@@ -47,45 +47,4 @@ defmodule ProtoValidator do
     |> struct(data)
     |> ProtoValidator.Verifiable.validate()
   end
-
-  @doc """
-  Translate rules
-  from:
-    [required: true, gt: 0, lt: 90]
-  to:
-    [
-      {Vex.Validators.Number, [greater_than: 0, message: "The id should greater than 0"]},
-      {Vex.Validators.Number, [less_than: 90, message: "The id should less than 90"]},
-      {Vex.Validators.Presence, [message: "The id should exists"]} 
-    ]
-  """
-  def translate_rules(field, rules) do
-    rules
-    |> Enum.map(&translate_rule/1)
-    |> Enum.reject(&is_nil/1)
-    |> Enum.map(fn {vex_module, options} ->
-      message = Keyword.get(options, :message)
-      message = "The #{field} #{message}"
-      {vex_module, Keyword.put(options, :message, message)}
-    end)
-  end
-
-  # TODO: put the rules translation to a separate file
-  def translate_rule({:gt, v}),
-    do: {Vex.Validators.Number, [greater_than: v, message: "should greater than #{v}"]}
-
-  def translate_rule({:lt, v}),
-    do: {Vex.Validators.Number, [less_than: v, message: "should less than #{v}"]}
-
-  def translate_rule({:required, true}), do: {Vex.Validators.Presence, [message: "should exists"]}
-  def translate_rule(), do: nil
-
-  def validate_field(data, field, rules) do
-    rules
-    |> Stream.map(fn {vex_module, options} ->
-      apply(vex_module, :validate, [Map.get(data, field), options])
-    end)
-    |> Stream.filter(&Kernel.match?({:error, _msg}, &1))
-    |> Enum.at(0, :ok)
-  end
 end

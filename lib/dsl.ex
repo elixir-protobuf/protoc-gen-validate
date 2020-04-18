@@ -1,11 +1,13 @@
 defmodule ProtoValidator.DSL do
   defmacro __before_compile__(_env) do
-    quote unquote: false do
+    validator = ProtoValidator.Validator.get_validator()
+
+    quote bind_quoted: [validator: validator] do
       Enum.map(@validations, fn {field, rules} ->
-        rules = ProtoValidator.translate_rules(field, rules)
+        rules = apply(validator, :translate_rules, [field, rules])
 
         def validate_field(unquote(field) = field, data) do
-          ProtoValidator.validate_field(data, field, unquote(rules))
+          apply(unquote(validator), :validate_field, [data, field, unquote(rules)])
         end
       end)
 
