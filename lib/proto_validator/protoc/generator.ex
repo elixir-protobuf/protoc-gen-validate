@@ -3,12 +3,12 @@ defmodule ProtoValidator.Protoc.Generator do
 
   alias Protobuf.Protoc.Metadata
 
-  def generate(file, ctx) do
+  def generate(file) do
     name = new_file_name(file.fqn)
 
     Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
       name: name,
-      content: generate_content(file, ctx)
+      content: generate_content(file)
     )
   end
 
@@ -16,18 +16,16 @@ defmodule ProtoValidator.Protoc.Generator do
     String.replace_suffix(name, ".proto", ".pb.validate.ex")
   end
 
-  defp generate_content(%Metadata.File{messages: messages} = file, ctx) do
-    all_msgs = Metadata.File.all_messages(file)
-
-    messages_code =
-      all_msgs
-      |> Enum.map(fn msg -> generate_message(msg, ctx) end)
-      |> Enum.join("\n")
-      |> Protobuf.Protoc.Generator.format_code()
+  defp generate_content(%Metadata.File{} = file) do
+    file
+    |> Metadata.File.all_messages()
+    |> Enum.map(fn msg -> generate_message(msg) end)
+    |> Enum.join("\n")
+    |> Protobuf.Protoc.Generator.format_code()
   end
 
   # TODO: put get_str functions to a separate module
-  defp generate_message({msg_metadata, _msg_desc}, ctx) do
+  defp generate_message({msg_metadata, _msg_desc}) do
     case get_validations(msg_metadata) do
       nil ->
         nil
@@ -54,19 +52,23 @@ defmodule ProtoValidator.Protoc.Generator do
   end
 
   defp get_validations(msg_metadata) do
-    validation_fields =
-      msg_metadata
-      |> Metadata.Message.fields()
-      |> Enum.map(fn
-        {_field_md,
-         %{name: name, options: %{__pb_extensions__: %{{Validate.PbExtension, :rules} => rules}}}} ->
-          {name, rules}
+    msg_metadata
+    |> Metadata.Message.fields()
+    |> Enum.map(fn
+      {_field_md, %{name: name, options: %{} = options}} ->
+        case Google.Protobuf.FieldOptions.get_extension(options, Validate.PbExtension, :rules) do
+          nil ->
+            nil
 
-        _ ->
-          nil
-      end)
-      |> Enum.reject(&is_nil/1)
-      |> gen_validation()
+          rules ->
+            {name, rules}
+        end
+
+      _ ->
+        nil
+    end)
+    |> Enum.reject(&is_nil/1)
+    |> gen_validation()
   end
 
   defp gen_validation([]), do: nil

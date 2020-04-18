@@ -5,3 +5,10 @@ defmodule ProtoValidator.Gen.Examplepb.User do
   validate(:id, required: true, gt: 0, lt: 90)
   validate(:email, required: true)
 end
+
+defmodule ProtoValidator.Gen.Examplepb.User.Phone do
+  @moduledoc false
+  use ProtoValidator, entity: Examplepb.User.Phone
+
+  validate(:phone_number, required: true)
+end

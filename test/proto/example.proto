@@ -5,7 +5,6 @@ package examplepb;
 import "validate.proto";
 
 message User {
-  // uint64 id    = 1 [(validate.rules).uint64.gt    = 0, (validate.rules).message.required = true];
   uint64 id    = 1 [(validate.rules) = {
     uint64: {gt: 0, lt: 90},
     message: {required: true}
@@ -21,7 +20,7 @@ message User {
   GENDER gender = 3;
 
   message Phone {
-    string phone_number = 1;
+    string phone_number = 1 [(validate.rules).message.required = true];
   }
 
   Phone phone = 4;
