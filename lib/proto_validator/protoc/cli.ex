@@ -32,6 +32,7 @@ defmodule ProtoValidator.Protoc.CLI do
         |> Enum.map(fn file_metadata ->
           ProtoValidator.Protoc.Generator.generate(file_metadata)
         end)
+        |> Enum.reject(&is_nil/1)
 
       Google.Protobuf.Compiler.CodeGeneratorResponse.new(file: files)
     end)

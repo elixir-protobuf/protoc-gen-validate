@@ -4,23 +4,18 @@ defmodule ProtoValidator.DSL do
 
     quote bind_quoted: [validator: validator] do
       Enum.map(@validations, fn {field, rules} ->
-        rules = apply(validator, :translate_rules, [field, rules])
+        rules = apply(validator, :translate_rules, [rules])
 
-        def validate_field(unquote(field) = field, data) do
-          apply(unquote(validator), :validate_field, [data, field, unquote(rules)])
+        def validate_value(unquote(field) = field, value) do
+          apply(
+            unquote(validator),
+            :validate_value,
+            [field, value, unquote(Macro.escape(rules))]
+          )
         end
       end)
 
-      def validate_field(field, _data), do: true
-
-      def validate(data) do
-        @validations
-        |> Stream.map(fn {field, _options} ->
-          validate_field(field, data)
-        end)
-        |> Stream.filter(&Kernel.match?({:error, msg}, &1))
-        |> Enum.at(0, :ok)
-      end
+      def validate_value(field, _value), do: :ok
     end
   end
 

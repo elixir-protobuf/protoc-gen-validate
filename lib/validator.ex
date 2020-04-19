@@ -6,4 +6,10 @@ defmodule ProtoValidator.Validator do
   end
 
   defp get_validator(:vex), do: ProtoValidator.Validator.Vex
+
+  def validate_uniq(nil), do: :ok
+
+  def validate_uniq(value) do
+    if Enum.uniq(value) == value, do: :ok, else: {:error, "values should be uniq"}
+  end
 end

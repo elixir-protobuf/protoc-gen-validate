@@ -1,55 +1,125 @@
 defmodule ProtoValidator.Validator.Vex do
   @moduledoc ""
 
-  def validate_field(data, field, rules) do
+  def validate_value(field, value, rules) when is_list(rules) do
     rules
-    |> Stream.map(fn {vex_module, options} ->
-      apply(vex_module, :validate, [Map.get(data, field), options])
-    end)
-    |> Stream.filter(&Kernel.match?({:error, _msg}, &1))
-    |> Enum.at(0, :ok)
+    |> ProtoValidator.Utils.pipe_validates(fn rule -> validate_value(value, rule) end)
+    |> case do
+      :ok -> :ok
+      # TODO: Improve error message
+      {:error, msg} -> {:error, "Invalid #{field}, #{msg}"}
+    end
+  end
+
+  def validate_value(nil, {:items, _rule}), do: :ok
+
+  def validate_value(nil, {:array, rule}) do
+    validate_value([], rule)
+  end
+
+  def validate_value(values, {:items, rule}) when is_list(values) do
+    ProtoValidator.Utils.pipe_validates(values, fn value -> validate_value(value, rule) end)
+  end
+
+  def validate_value(values, {:array, rule}) when is_list(values) do
+    validate_value(values, rule)
+  end
+
+  def validate_value(_values, {:array, _rule}) do
+    {:error, "should be a list"}
+  end
+
+  def validate_value(value, {:function, {m, f}}) do
+    apply(m, f, [value])
+  end
+
+  def validate_value(value, {vex_module, options}) when is_list(options) do
+    apply(vex_module, :validate, [value, options])
+  end
+
+  def validate_value(value, rule) do
+    {:error, "Failed to validate value #{inspect(value)} against on rule: #{inspect(rule)}"}
   end
 
   @doc """
   Translate rules
-  from:
-    [required: true, uint64: [gt: 0, lt: 90]]
-  to:
+  - raw rules:
+    [required: true, repeated: [items: [uint64: [gt: 0, lt: 90]], min_items: 0, unique: true]]
+  - flatten:
     [
-      {Vex.Validators.Number, [greater_than: 0, message: "The id should greater than 0"]},
-      {Vex.Validators.Number, [less_than: 90, message: "The id should less than 90"]},
-      {Vex.Validators.Presence, [message: "The id should exists"]} 
+      required: true,
+      repeated: {:items, {:uint64, {:gt, 0}}},
+      repeated: {:items, {:uint64, {:lt, 90}}},
+      repeated: {:min_items, 0},
+      repeated: {:unique, true}
+    ]
+  - result:
+    [
+      {Vex.Validators.Presence, [message: "should exists"]},
+      {:items, {Vex.Validators.Number, [greater_than: 0, message: "should greater than 0"]}},
+      {:items, {Vex.Validators.Number, [less_than: 0, message: "should less than 90"]}},
+      {:array, {Vex.Validators.Length, [nim: 0, message: "length should greater then 0"]}},
+      {:function, {ProtoValidator.Validator.Vex, :validate_uniq}}
     ]
   """
-  def translate_rules(field, rules) do
+  def translate_rules(rules) do
     rules
     |> flatten_rules()
     |> Enum.map(&translate_rule/1)
     |> Enum.reject(&is_nil/1)
-    |> Enum.map(fn {vex_module, options} ->
-      message = Keyword.get(options, :message)
-      message = "The #{field} #{message}"
-      {vex_module, Keyword.put(options, :message, message)}
-    end)
   end
 
-  defp flatten_rules(rules) do
+  def flatten_rules(rules) when is_list(rules) do
     rules
     |> Enum.map(fn
-      {_type, type_rules} when is_list(type_rules) -> type_rules
-      rules -> rules
+      {k, rules} when is_list(rules) ->
+        rules
+        |> flatten_rules()
+        |> Enum.map(fn rule -> {k, rule} end)
+
+      rule ->
+        rule
     end)
     |> List.flatten()
   end
 
-  defp translate_rule({:gt, v}),
-    do: {Vex.Validators.Number, [greater_than: v, message: "should greater than #{v}"]}
+  def flatten_rules(rules), do: rules
 
-  defp translate_rule({:lt, v}),
-    do: {Vex.Validators.Number, [less_than: v, message: "should less than #{v}"]}
+  [
+    required: true,
+    repeated: {:items, {:uint64, {:gt, 0}}},
+    repeated: {:items, {:uint64, {:lt, 90}}},
+    repeated: {:min_items, 0},
+    repeated: {:unique, true}
+  ]
 
-  defp translate_rule({:required, true}),
-    do: {Vex.Validators.Presence, [message: "should exists"]}
+  defp translate_rule({_, {:gt, v}}) do
+    {Vex.Validators.Number, [greater_than: v, message: "should greater than #{v}"]}
+  end
+
+  defp translate_rule({_, {:lt, v}}) do
+    {Vex.Validators.Number, [less_than: v, message: "should less than #{v}"]}
+  end
+
+  defp translate_rule({:required, true}) do
+    {Vex.Validators.Presence, [message: "should exists"]}
+  end
+
+  defp translate_rule({:repeated, {:items, rule}}) do
+    {:items, translate_rule(rule)}
+  end
+
+  defp translate_rule({:repeated, {:min_items, v}}) do
+    {:array, {Vex.Validators.Length, [min: v, message: "length should greater then #{v}"]}}
+  end
+
+  defp translate_rule({:repeated, {:max_items, v}}) do
+    {:array, {Vex.Validators.Length, [max: v, message: "length should less then #{v}"]}}
+  end
+
+  defp translate_rule({:repeated, {:unique, true}}) do
+    {:function, {ProtoValidator.Validator, :validate_uniq}}
+  end
 
   defp translate_rule(_), do: nil
 end

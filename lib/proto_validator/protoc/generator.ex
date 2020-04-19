@@ -2,14 +2,19 @@ defmodule ProtoValidator.Protoc.Generator do
   @moduledoc false
 
   alias Protobuf.Protoc.Metadata
+  alias ProtoValidator.Protoc.Utils
+  alias Google.Protobuf.Compiler.CodeGeneratorResponse
 
   def generate(file) do
     name = new_file_name(file.fqn)
 
-    Google.Protobuf.Compiler.CodeGeneratorResponse.File.new(
-      name: name,
-      content: generate_content(file)
-    )
+    case generate_content(file) do
+      nil ->
+        nil
+
+      content ->
+        CodeGeneratorResponse.File.new(name: name, content: content)
+    end
   end
 
   defp new_file_name(name) do
@@ -20,8 +25,16 @@ defmodule ProtoValidator.Protoc.Generator do
     file
     |> Metadata.File.all_messages()
     |> Enum.map(fn msg -> generate_message(msg) end)
-    |> Enum.join("\n")
-    |> Protobuf.Protoc.Generator.format_code()
+    |> Enum.reject(&is_nil/1)
+    |> case do
+      [] ->
+        nil
+
+      validations ->
+        validations
+        |> Enum.join("\n")
+        |> Protobuf.Protoc.Generator.format_code()
+    end
   end
 
   # TODO: put get_str functions to a separate module
@@ -74,25 +87,8 @@ defmodule ProtoValidator.Protoc.Generator do
   defp gen_validation([]), do: nil
 
   defp gen_validation(validations) do
-    Enum.map(validations, fn {name, %Validate.FieldRules{message: message, type: type}} ->
-      message_rule_str_list = get_rule_str_list(message)
-      type_rule_str_list = get_rule_str_list(type)
-      rules_str = "#{message_rule_str_list}#{type_rule_str_list}"
-
-      ":#{name}, #{rules_str}"
+    Enum.map(validations, fn {name, rules} ->
+      ":#{name}, #{Utils.get_rule_str(rules)}"
     end)
-  end
-
-  defp get_rule_str_list(nil), do: nil
-
-  defp get_rule_str_list({type, type_rules}) do
-    ", #{type}: [#{get_rule_str_list(type_rules)}]"
-  end
-
-  defp get_rule_str_list(rules) do
-    rules
-    |> Map.from_struct()
-    |> Enum.map(fn {k, v} -> "#{k}: #{v}" end)
-    |> Enum.join(", ")
   end
 end
