@@ -15,27 +15,59 @@ end
 ## Usage
 
 ```elixir
-defmodule User do
-  use Protobuf
+message User {
+  uint64 id    = 1 [(validate.rules) = {
+    uint64: {gt: 0, lt: 90},
+    message: {required: true}
+  }];
 
-  field :id, 1, type: :uint64
-  field :email, 2, type: :string
+  string email = 2 [(validate.rules).message.required = true];
+
+  GENDER gender = 3;
+
+  message Phone {
+    string phone_number = 1 [(validate.rules) = {
+      uint64: {gt: 1000, lt: 2000}, 
+      message: {required: true}
+    }];
+  }
+
+  repeated Phone phones = 4 [(validate.rules).repeated.min_items = 1];
+
+  repeated uint64 following_ids = 5 [(validate.rules).repeated = {
+    min_items: 0,
+    unique: true,
+    items: {uint64: {gt: 0, lt: 90}}
+  }];
+}
+
+defmodule ProtoValidator.Gen.Examplepb.User do
+  @moduledoc false
+  use ProtoValidator, entity: Examplepb.User
+
+  validate(:id, required: true, uint64: [gt: 0, lt: 90])
+  validate(:email, required: true)
+  validate(:phones, repeated: [min_items: 1])
+
+  validate(:following_ids,
+    repeated: [items: [uint64: [gt: 0, lt: 90]], min_items: 0, unique: true]
+  )
 end
 
-defmodule ProtoValidator.Gen.User do
-  use ProtoValidator
+defmodule ProtoValidator.Gen.Examplepb.User.Phone do
+  @moduledoc false
+  use ProtoValidator, entity: Examplepb.User.Phone
 
-  validate :id, gt: 0
-  validate :email, required: true
+  validate(:phone_number, required: true, uint64: [gt: 1000, lt: 2000])
 end
 
-alias ProtoValidator.Gen.User, as: Validator
 user = User.new()
-{:error, _} = Validator.validate(user)
+{:error, _} = ProtoValidator.validate(user)
 users = %{user | id: 1}
 {:error, _} = Validator.validate(user)
 users = %{user | email: "user@example.com"}
-:ok = Validator.validate(user)
+:ok = ProtoValidator.validate(user)
+:ok = ProtoValidator.Gen.Examplepb.User.validate(user)
 ```
 
 ## How it works
