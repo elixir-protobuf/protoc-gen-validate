@@ -13,8 +13,11 @@ end
 ```
 
 ## Usage
+Developers import the ProtoValidator and annotate the messages and fields in their proto files with constraint rules:
 
-```elixir
+``` Elixir
+package emamplepb
+
 message User {
   uint64 id    = 1 [(validate.rules) = {
     uint64: {gt: 0, lt: 90},
@@ -40,7 +43,9 @@ message User {
     items: {uint64: {gt: 0, lt: 90}}
   }];
 }
-
+```
+Then ProtoValidator will generate the validator modules for messages that have constraint rules automatically like:
+``` Elixir
 defmodule ProtoValidator.Gen.Examplepb.User do
   @moduledoc false
   use ProtoValidator, entity: Examplepb.User
@@ -60,11 +65,13 @@ defmodule ProtoValidator.Gen.Examplepb.User.Phone do
 
   validate(:phone_number, required: true, uint64: [gt: 1000, lt: 2000])
 end
-
-user = User.new()
+```
+Then both `&ProtoValidator.validate/1` and `&ProtoValidator.Gen.Examplepb.User/1` can be used to do the validation.
+``` Elixir
+user = Examplepb.User.new()
 {:error, _} = ProtoValidator.validate(user)
 users = %{user | id: 1}
-{:error, _} = Validator.validate(user)
+{:error, _} = ProtoValidator.validate(user)
 users = %{user | email: "user@example.com"}
 :ok = ProtoValidator.validate(user)
 :ok = ProtoValidator.Gen.Examplepb.User.validate(user)
