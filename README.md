@@ -16,7 +16,7 @@ end
 Developers import the ProtoValidator and annotate the messages and fields in their proto files with constraint rules:
 
 ``` Elixir
-package emamplepb
+package examplepb
 
 message User {
   uint64 id    = 1 [(validate.rules) = {
