@@ -21,7 +21,7 @@ message User {
   GENDER gender = 3;
 
   message Phone {
-    string phone_number = 1 [(validate.rules) = {
+    uint64 phone_number = 1 [(validate.rules) = {
       uint64: {gt: 1000, lt: 2000}, 
       message: {required: true}
     }];
