@@ -17,9 +17,8 @@ defmodule ProtoValidator.Protoc.CLI do
       pkgs = Protobuf.Protoc.Parser.parse(request)
 
       # debug
-      raise inspect(pkgs, limit: :infinity)
+      # raise inspect(pkgs, limit: :infinity)
 
-      # raise :ets.lookup(Protobuf.Protoc.Parser, {:desc, "example.proto"})
       # msg = Google.Protobuf.FieldOptions.new()
       # rules = %Validate.FieldRules{}
       # msg = Google.Protobuf.FieldOptions.put_extension(msg, Validate.PbExtension, :rules, rules)
@@ -27,7 +26,15 @@ defmodule ProtoValidator.Protoc.CLI do
 
       # debug end
 
-      Google.Protobuf.Compiler.CodeGeneratorResponse.new(file: [])
+      files =
+        pkgs
+        |> Enum.flat_map(fn pkg -> pkg.files end)
+        |> Enum.map(fn file_metadata ->
+          ProtoValidator.Protoc.Generator.generate(file_metadata)
+        end)
+        |> Enum.reject(&is_nil/1)
+
+      Google.Protobuf.Compiler.CodeGeneratorResponse.new(file: files)
     end)
   end
 end

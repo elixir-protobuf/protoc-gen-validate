@@ -8,7 +8,9 @@ defmodule ProtoValidator.MixProject do
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
       escript: escript(),
-      deps: deps()
+      deps: deps(),
+      package: package(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -19,6 +21,9 @@ defmodule ProtoValidator.MixProject do
     ]
   end
 
+  defp elixirc_paths(:test), do: ["lib", "test/proto_gen"]
+  defp elixirc_paths(_), do: ["lib"]
+
   defp escript do
     [main_module: ProtoValidator.Protoc.CLI, name: "protoc-gen-validate"]
   end
@@ -26,7 +31,14 @@ defmodule ProtoValidator.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:protobuf, github: "tony612/protobuf-elixir", branch: "refactor-protoc"}
+      {:protobuf, github: "tony612/protobuf-elixir", branch: "refactor-protoc"},
+      {:vex, "~> 0.8.0"}
     ]
+  end
+
+  defp package() do
+    %{
+      files: ~w(mix.exs README.md lib src LICENSE priv/templates .formatter.exs)
+    }
   end
 end

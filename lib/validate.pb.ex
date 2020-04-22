@@ -12,6 +12,7 @@ defmodule Validate.FieldRules do
 
   field :message, 17, optional: true, type: Validate.MessageRules
   field :uint64, 6, optional: true, type: Validate.UInt64Rules, oneof: 0
+  field :repeated, 18, optional: true, type: Validate.RepeatedRules, oneof: 0
 end
 
 defmodule Validate.MessageRules do
@@ -31,11 +32,31 @@ defmodule Validate.UInt64Rules do
   use Protobuf, syntax: :proto2
 
   @type t :: %__MODULE__{
+          lt: non_neg_integer,
           gt: non_neg_integer
         }
-  defstruct [:gt]
+  defstruct [:lt, :gt]
 
+  field :lt, 2, optional: true, type: :uint64
   field :gt, 4, optional: true, type: :uint64
+end
+
+defmodule Validate.RepeatedRules do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          min_items: non_neg_integer,
+          max_items: non_neg_integer,
+          unique: boolean,
+          items: Validate.FieldRules.t() | nil
+        }
+  defstruct [:min_items, :max_items, :unique, :items]
+
+  field :min_items, 1, optional: true, type: :uint64
+  field :max_items, 2, optional: true, type: :uint64
+  field :unique, 3, optional: true, type: :bool
+  field :items, 4, optional: true, type: Validate.FieldRules
 end
 
 defmodule Validate.PbExtension do
