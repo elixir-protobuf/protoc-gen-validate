@@ -5,6 +5,7 @@ defprotocol ProtoValidator.Verifiable do
 end
 
 defimpl ProtoValidator.Verifiable, for: Any do
+  @impl true
   def validate(_), do: :ok
 end
 
@@ -16,72 +17,48 @@ defmodule ProtoValidator do
   ProtoValidator.validate(Examplepb.User, %{id: 1, email: "example@example.com"})
   """
 
-  defmacro __using__(opts) do
-    # entity_module = Keyword.get(opts, :entity)
+  import ProtoValidator.Utils, only: [is_internal_type: 1, pipe_validates: 2]
 
-    quote location: :keep do
+  defmacro __using__(opts) do
+    entity_module = Keyword.get(opts, :entity)
+
+    quote location: :keep, bind_quoted: [entity_module: entity_module] do
       import ProtoValidator.DSL, only: [validate: 2]
 
-      @options unquote(opts)
       Module.register_attribute(__MODULE__, :validations, accumulate: true)
 
+      # The validator module like ProtoValidator.Gen.Examplepb.User
       validator_module = __MODULE__
-
-      entity_module = Keyword.get(@options, :entity)
 
       defimpl ProtoValidator.Verifiable, for: entity_module do
         @validator_module validator_module
+
+        @impl true
         def validate(data) do
           apply(@validator_module, :validate, [data])
         end
-      end
-
-      def validate(%{__struct__: protobuf_module} = data) do
-        props = protobuf_module.__message_props__()
-
-        props
-        |> Map.get(:field_props)
-        |> Stream.filter(fn {_, %{oneof: oneof}} -> is_nil(oneof) end)
-        |> ProtoValidator.Utils.pipe_validates(fn {_, %{name_atom: field} = field_prop} ->
-          value = Map.get(data, field)
-
-          case validate_value(field, value) do
-            :ok -> validate_field(field_prop, value)
-            {:error, msg} -> {:error, msg}
-          end
-        end)
-      end
-
-      def validate(data) when is_map(data) do
-        @options |> Keyword.get(:entity) |> struct(data) |> validate()
-      end
-
-      def validate(_), do: :ok
-
-      def validate_field(_, nil), do: :ok
-
-      def validate_field(%{type: type, repeated?: true}, values) do
-        ProtoValidator.Utils.pipe_validates(values, fn value ->
-          ProtoValidator.validate(type, value)
-        end)
-      end
-
-      def validate_field(%{type: type} = field_prop, value) do
-        ProtoValidator.validate(type, value)
       end
 
       @before_compile ProtoValidator.DSL
     end
   end
 
-  def validate(%_{} = data) do
-    ProtoValidator.Verifiable.validate(data)
+  def validate(data_list) when is_list(data_list) do
+    pipe_validates(data_list, &validate(&1))
   end
 
-  def validate(_), do: :ok
+  def validate(data), do: ProtoValidator.Verifiable.validate(data)
 
-  def validate(_module, %_{} = data) do
-    validate(data)
+  def validate(module, data_list) when is_list(data_list) do
+    pipe_validates(data_list, &validate(module, &1))
+  end
+
+  def validate(module, %_{} = data) do
+    if Map.get(data, :__struct__) == module do
+      validate(data)
+    else
+      {:error, "Can not match data #{inspect(data)} on type #{inspect(module)}"}
+    end
   end
 
   def validate(module, data) when is_map(data) do
@@ -90,6 +67,10 @@ defmodule ProtoValidator do
     |> ProtoValidator.Verifiable.validate()
   rescue
     err -> {:error, inspect(err)}
+  end
+
+  def validate(module, data) when is_internal_type(module) do
+    ProtoValidator.Validator.validate_internal_type(module, data)
   end
 
   def validate(_, _), do: :ok

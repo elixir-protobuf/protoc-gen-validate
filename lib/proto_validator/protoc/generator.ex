@@ -37,7 +37,6 @@ defmodule ProtoValidator.Protoc.Generator do
     end
   end
 
-  # TODO: put get_str functions to a separate module
   defp generate_message({msg_metadata, _msg_desc}) do
     case get_validations(msg_metadata) do
       nil ->
@@ -51,12 +50,9 @@ defmodule ProtoValidator.Protoc.Generator do
   end
 
   defp get_message_name(%Metadata.Message{fqn: fqn}) do
-    names =
-      fqn
-      |> String.split(".")
-      |> Enum.map(&String.capitalize/1)
+    module_name = Utils.get_module_name(fqn)
 
-    {Enum.join(names, "."), Enum.join(["ProtoValidator.Gen" | names], ".")}
+    {module_name, "ProtoValidator.Gen.#{module_name}"}
   end
 
   defp get_options_str(options) do
@@ -68,27 +64,26 @@ defmodule ProtoValidator.Protoc.Generator do
     msg_metadata
     |> Metadata.Message.fields()
     |> Enum.map(fn
-      {_field_md, %{name: name, options: %{} = options}} ->
-        case Google.Protobuf.FieldOptions.get_extension(options, Validate.PbExtension, :rules) do
-          nil ->
-            nil
+      {_field_md, %{name: name, type: type, type_name: type_name, label: label} = field_metadata} ->
+        type = Utils.get_type_name(type, type_name, label)
 
-          rules ->
-            {name, rules}
-        end
+        rules =
+          field_metadata
+          |> Map.get(:options)
+          # %{options: nil}
+          |> Kernel.||(%Google.Protobuf.FieldOptions{})
+          |> Google.Protobuf.FieldOptions.get_extension(Validate.PbExtension, :rules)
 
-      _ ->
-        nil
+        {name, type, rules}
     end)
-    |> Enum.reject(&is_nil/1)
     |> gen_validation()
   end
 
   defp gen_validation([]), do: nil
 
   defp gen_validation(validations) do
-    Enum.map(validations, fn {name, rules} ->
-      ":#{name}, #{Utils.get_rule_str(rules)}"
+    Enum.map(validations, fn {name, type, rules} ->
+      ":#{name}, #{Utils.get_rule_str(type, rules)}"
     end)
   end
 end

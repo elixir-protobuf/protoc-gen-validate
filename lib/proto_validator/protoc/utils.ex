@@ -1,6 +1,5 @@
 defmodule ProtoValidator.Protoc.Utils do
-  @moduledoc """
-  """
+  @moduledoc false
 
   @doc """
   convert rules map to string:
@@ -24,6 +23,12 @@ defmodule ProtoValidator.Protoc.Utils do
   To:
     "required: true, repeated: [items: [uint64: [gt: 0, lt: 90]], min_items: 0, unique: true]"
   """
+  def get_rule_str(type, rules) do
+    ["type: #{type}", get_rule_str(rules)]
+    |> Enum.reject(&is_nil/1)
+    |> Enum.join(",")
+  end
+
   def get_rule_str(%{message: message, type: type}) do
     [get_rule_str(message), get_rule_str(type)]
     |> Enum.reject(&is_nil/1)
@@ -55,4 +60,42 @@ defmodule ProtoValidator.Protoc.Utils do
   end
 
   def get_rule_str(v), do: to_string(v)
+
+  @doc """
+  Get type name string
+  iex> get_type_name(:TYPE_MESSAGE, ".examplepb.User.Phone", :LABEL_REPEATED)
+  "{:repeated, Examplepb.User.Phone}"
+
+  iex> get_type_name(:TYPE_Enum, ".examplepb.User.Gender", :LABEL_OPTIONAL)
+  "Examplepb.User.Gender"
+
+  iex> get_type_name(:TYPE_STRING, nil, :LABEL_OPTIONAL)
+  ":string"
+  """
+  def get_type_name(type, type_name, :LABEL_REPEATED) do
+    "{:repeated, #{get_type_name(type, type_name)}}"
+  end
+
+  def get_type_name(type, type_name, _), do: get_type_name(type, type_name)
+  defp get_type_name(type, nil), do: ":#{Protobuf.TypeUtil.from_enum(type)}"
+
+  defp get_type_name(_type, type_name) do
+    get_module_name(type_name)
+  end
+
+  @doc """
+  iex> get_module_name("examplepb.User")
+  "Examplepb.User"
+  iex> get_module_name(".examplepb.Phone")
+  "Examplepb.Phone"
+  iex> get_module_name(".examplepb.GENDER")
+  "Examplepb.Gender"
+  """
+  def get_module_name(module_str) do
+    module_str
+    |> String.split(".")
+    |> Enum.reject(&(&1 == ""))
+    |> Enum.map(&String.capitalize/1)
+    |> Enum.join(".")
+  end
 end
