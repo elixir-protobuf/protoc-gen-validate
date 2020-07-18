@@ -1,9 +1,9 @@
 defmodule ProtoValidator.Validator.Vex do
   @moduledoc ""
 
-  def validate_value(field, value, rules) when is_list(rules) do
+  def validate_rule(field, value, rules) when is_list(rules) do
     rules
-    |> ProtoValidator.Utils.pipe_validates(fn rule -> validate_value(value, rule) end)
+    |> ProtoValidator.Utils.pipe_validates(fn rule -> validate_rule(value, rule) end)
     |> case do
       :ok -> :ok
       # TODO: Improve error message
@@ -11,40 +11,40 @@ defmodule ProtoValidator.Validator.Vex do
     end
   end
 
-  def validate_value(nil, {:items, _rule}), do: :ok
+  def validate_rule(nil, {:items, _rule}), do: :ok
 
-  def validate_value(nil, {:array, rule}) do
-    validate_value([], rule)
+  def validate_rule(nil, {:array, rule}) do
+    validate_rule([], rule)
   end
 
-  def validate_value(values, {:items, rule}) when is_list(values) do
-    ProtoValidator.Utils.pipe_validates(values, fn value -> validate_value(value, rule) end)
+  def validate_rule(values, {:items, rule}) when is_list(values) do
+    ProtoValidator.Utils.pipe_validates(values, fn value -> validate_rule(value, rule) end)
   end
 
-  def validate_value(values, {:array, rule}) when is_list(values) do
-    validate_value(values, rule)
+  def validate_rule(values, {:array, rule}) when is_list(values) do
+    validate_rule(values, rule)
   end
 
-  def validate_value(_values, {:array, _rule}) do
+  def validate_rule(_values, {:array, _rule}) do
     {:error, "should be a list"}
   end
 
-  def validate_value(value, {:function, {m, f}}) do
+  def validate_rule(value, {:function, {m, f}}) do
     apply(m, f, [value])
   end
 
-  def validate_value(value, {vex_module, options}) when is_list(options) do
+  def validate_rule(value, {vex_module, options}) when is_list(options) do
     apply(vex_module, :validate, [value, options])
   end
 
-  def validate_value(value, rule) do
+  def validate_rule(value, rule) do
     {:error, "Failed to validate value #{inspect(value)} against on rule: #{inspect(rule)}"}
   end
 
   @doc """
   Translate rules
   - raw rules:
-    [required: true, repeated: [items: [uint64: [gt: 0, lt: 90]], min_items: 0, unique: true]]
+    [type: :uint64, required: true, repeated: [items: [uint64: [gt: 0, lt: 90]], min_items: 0, unique: true]]
   - flatten:
     [
       required: true,
@@ -84,14 +84,6 @@ defmodule ProtoValidator.Validator.Vex do
   end
 
   def flatten_rules(rules), do: rules
-
-  [
-    required: true,
-    repeated: {:items, {:uint64, {:gt, 0}}},
-    repeated: {:items, {:uint64, {:lt, 90}}},
-    repeated: {:min_items, 0},
-    repeated: {:unique, true}
-  ]
 
   defp translate_rule({_, {:gt, v}}) do
     {Vex.Validators.Number, [greater_than: v, message: "should greater than #{v}"]}

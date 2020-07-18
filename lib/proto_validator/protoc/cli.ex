@@ -19,13 +19,6 @@ defmodule ProtoValidator.Protoc.CLI do
       # debug
       # raise inspect(pkgs, limit: :infinity)
 
-      # msg = Google.Protobuf.FieldOptions.new()
-      # rules = %Validate.FieldRules{}
-      # msg = Google.Protobuf.FieldOptions.put_extension(msg, Validate.PbExtension, :rules, rules)
-      # raise inspect(Google.Protobuf.FieldOptions.get_extension(msg, Validate.PbExtension, :rules))
-
-      # debug end
-
       files =
         pkgs
         |> Enum.flat_map(fn pkg -> pkg.files end)

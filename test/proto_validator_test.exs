@@ -33,6 +33,49 @@ defmodule ProtoValidator.ProtoValidatorTest do
       assert :ok = ProtoValidator.validate(Examplepb.User, user)
     end
 
+    test "validate list data work" do
+      user1 = %Examplepb.User{
+        id: 10,
+        email: "user1@example.com",
+        gender: :MALE,
+        phones: [
+          %Examplepb.User.Phone{
+            phone_number: 1888
+          }
+        ],
+        following_ids: [1, 2, 3]
+      }
+
+      user2 = %Examplepb.User{
+        id: 11,
+        email: "user2@example.com",
+        gender: :FEMALE,
+        phones: [
+          %Examplepb.User.Phone{
+            phone_number: 1999
+          }
+        ],
+        following_ids: [1]
+      }
+
+      user3 = %Examplepb.User{
+        id: 11,
+        email: "user2@example.com",
+        gender: :FEMALE,
+        phones: [
+          %Examplepb.User.Phone{
+            phone_number: 4000
+          }
+        ],
+        following_ids: [1]
+      }
+
+      assert :ok == ProtoValidator.validate([user1, user2])
+
+      assert {:error, "Invalid phone_number, should less than 2000"} ==
+               ProtoValidator.validate([user1, user2, user3])
+    end
+
     test "get :error for valid struct" do
       user = %Examplepb.User{
         id: 10,
@@ -71,7 +114,19 @@ defmodule ProtoValidator.ProtoValidatorTest do
 
   describe "test invalid data" do
     test "got :error number exceeds the specified range" do
-      user = %Examplepb.User{id: 100}
+      user = %Examplepb.User{
+        id: "100",
+        email: "example@test.com",
+        phones: [
+          %Examplepb.User.Phone{
+            phone_number: 1111
+          }
+        ]
+      }
+
+      assert {:error, "\"100\" is not integer"} = ProtoValidator.validate(user)
+
+      user = %{user | id: 100}
       assert {:error, "Invalid id, should less than 90"} = ProtoValidator.validate(user)
     end
 
@@ -125,6 +180,11 @@ defmodule ProtoValidator.ProtoValidatorTest do
       }
 
       assert {:error, "Invalid following_ids, should less than 90"} ==
+               ProtoValidator.validate(user)
+
+      user = %{user | following_ids: [1, 2, "3"]}
+
+      assert {:error, "\"3\" is not integer"} ==
                ProtoValidator.validate(user)
 
       user = %{user | following_ids: [1, 1, 2]}
