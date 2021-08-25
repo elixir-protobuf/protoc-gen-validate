@@ -16,6 +16,10 @@ defmodule ProtoValidator.Protoc.CLI do
     Protobuf.Protoc.run(fn request ->
       pkgs = Protobuf.Protoc.Parser.parse(request)
 
+      ctx =
+        %Protobuf.Protoc.Context{}
+        |> Protobuf.Protoc.find_types(request.proto_file)
+
       # debug
       # raise inspect(pkgs, limit: :infinity)
 
@@ -23,7 +27,7 @@ defmodule ProtoValidator.Protoc.CLI do
         pkgs
         |> Enum.flat_map(fn pkg -> pkg.files end)
         |> Enum.map(fn file_metadata ->
-          ProtoValidator.Protoc.Generator.generate(file_metadata)
+          ProtoValidator.Protoc.Generator.generate(ctx, file_metadata)
         end)
         |> Enum.reject(&is_nil/1)
 

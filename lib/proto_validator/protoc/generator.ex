@@ -5,10 +5,10 @@ defmodule ProtoValidator.Protoc.Generator do
   alias ProtoValidator.Protoc.Utils
   alias Google.Protobuf.Compiler.CodeGeneratorResponse
 
-  def generate(file) do
+  def generate(ctx, file) do
     name = new_file_name(file.fqn)
 
-    case generate_content(file) do
+    case generate_content(ctx, file) do
       nil ->
         nil
 
@@ -21,10 +21,18 @@ defmodule ProtoValidator.Protoc.Generator do
     String.replace_suffix(name, ".proto", ".pb.validate.ex")
   end
 
-  defp generate_content(%Metadata.File{} = file) do
+  defp generate_content(ctx, %Metadata.File{} = file) do
+    type_mappings =
+      for {_file_name, mappings} <- ctx.global_type_mapping,
+          {dot_prefixed_fqn, type_name_map} <- mappings,
+          into: %{} do
+        <<?., fqn::binary>> = dot_prefixed_fqn
+        {fqn, type_name_map.type_name}
+      end
+
     file
     |> Metadata.File.all_messages()
-    |> Enum.map(fn msg -> generate_message(msg) end)
+    |> Enum.map(fn msg -> generate_message(type_mappings, msg) end)
     |> Enum.reject(&is_nil/1)
     |> case do
       [] ->
@@ -37,21 +45,20 @@ defmodule ProtoValidator.Protoc.Generator do
     end
   end
 
-  defp generate_message({msg_metadata, _msg_desc}) do
+  defp generate_message(type_mappings, {msg_metadata, msg_desc}) do
     case get_validations(msg_metadata) do
       nil ->
         nil
 
       validations ->
-        {entity, validate_name} = get_message_name(msg_metadata)
+        {entity, validate_name} = get_message_name(type_mappings, msg_metadata)
         option_str = get_options_str(%{entity: entity})
         ProtoValidator.Protoc.Template.message(validate_name, option_str, validations)
     end
   end
 
-  defp get_message_name(%Metadata.Message{fqn: fqn}) do
-    module_name = Utils.get_module_name(fqn)
-
+  defp get_message_name(type_mappings, %Metadata.Message{fqn: fqn}) do
+    module_name = Map.fetch!(type_mappings, fqn)
     {module_name, "ProtoValidator.Gen.#{module_name}"}
   end
 
