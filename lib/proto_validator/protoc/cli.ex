@@ -13,25 +13,24 @@ defmodule ProtoValidator.Protoc.CLI do
   end
 
   def main(_) do
-    Protobuf.Protoc.run(fn request ->
-      pkgs = Protobuf.Protoc.Parser.parse(request)
+    :io.setopts(:standard_io, encoding: :latin1)
+    bin = IO.binread(:all)
+    request = Protobuf.Decoder.decode(bin, Google.Protobuf.Compiler.CodeGeneratorRequest)
 
-      ctx =
-        %Protobuf.Protoc.Context{}
-        |> Protobuf.Protoc.find_types(request.proto_file)
+    ctx =
+      %Protobuf.Protoc.Context{}
+      |> Protobuf.Protoc.CLI.find_types(request.proto_file)
 
-      # debug
-      # raise inspect(pkgs, limit: :infinity)
+    # debug
+    # raise inspect(ctx, limit: :infinity)
 
-      files =
-        pkgs
-        |> Enum.flat_map(fn pkg -> pkg.files end)
-        |> Enum.map(fn file_metadata ->
-          ProtoValidator.Protoc.Generator.generate(ctx, file_metadata)
-        end)
-        |> Enum.reject(&is_nil/1)
+    files =
+      request.proto_file
+      |> Enum.filter(fn desc -> Enum.member?(request.file_to_generate, desc.name) end)
+      |> Enum.map(fn desc -> ProtoValidator.Protoc.Generator.generate(ctx, desc) end)
+      |> Enum.reject(&is_nil/1)
 
-      Google.Protobuf.Compiler.CodeGeneratorResponse.new(file: files)
-    end)
+    response = Google.Protobuf.Compiler.CodeGeneratorResponse.new(file: files)
+    IO.binwrite(Protobuf.Encoder.encode(response))
   end
 end
