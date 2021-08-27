@@ -47,7 +47,7 @@ defmodule ProtoValidator.Protoc.Generator do
   end
 
   defp generate_message(ctx, type_mappings, desc) do
-    case get_validations(desc) do
+    case get_validations(ctx, type_mappings, desc) do
       nil ->
         nil
 
@@ -70,12 +70,13 @@ defmodule ProtoValidator.Protoc.Generator do
     if String.length(str) > 0, do: ", " <> str, else: ""
   end
 
-  defp get_validations(desc) do
+  defp get_validations(_ctx, type_mappings, desc) do
     desc.field
     |> Enum.map(fn
       field_metadata ->
-        %{name: name, type: type, type_name: type_name, label: label} = field_metadata
-        type = Utils.get_type_name(type, type_name, label)
+        %{name: name, type: field_type, type_name: type_name, label: label} = field_metadata
+
+        type = get_type_name(field_type, type_name, label, type_mappings)
 
         rules =
           field_metadata
@@ -87,6 +88,22 @@ defmodule ProtoValidator.Protoc.Generator do
         {name, type, rules}
     end)
     |> gen_validation()
+  end
+
+  # Copied from Utils.get_type_name and changed
+  defp get_type_name(type, type_name, :LABEL_REPEATED, type_mappings) do
+    "{:repeated, #{get_type_name(type, type_name, type_mappings)}}"
+  end
+
+  defp get_type_name(type, type_name, _label, type_mappings) do
+    get_type_name(type, type_name, type_mappings)
+  end
+
+  defp get_type_name(type, nil, _type_mappings), do: ":#{Protobuf.TypeUtil.from_enum(type)}"
+
+  defp get_type_name(_type, type_name, type_mappings) do
+    <<?., fqn::binary>> = type_name
+    Map.fetch!(type_mappings, fqn)
   end
 
   defp gen_validation([]), do: nil
