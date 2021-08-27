@@ -67,7 +67,14 @@ defmodule ProtoValidator.Protoc.Generator do
 
   defp get_options_str(options) do
     str = Protobuf.Protoc.Generator.Util.options_to_str(options)
-    if String.length(str) > 0, do: ", " <> str, else: ""
+    str = if String.length(str) > 0, do: ", " <> str, else: ""
+
+    # Add extra line separator.
+    #
+    #  use ProtoValidator, entity: ...
+    #  # This line is removed at Elixir 1.12.2 (compiled with Erlang/OTP 24)
+    #  validate(:id, type: :int64)
+    str <> "\n"
   end
 
   defp get_validations(_ctx, type_mappings, desc) do
