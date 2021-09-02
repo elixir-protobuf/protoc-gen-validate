@@ -15,6 +15,7 @@ message FieldRules {
     oneof type {
         // Scalar Field Types
         UInt64Rules   uint64   = 6;
+        StringRules   string   = 14;
         RepeatedRules repeated = 18;
     }
 }
@@ -33,6 +34,19 @@ message UInt64Rules {
     // exclusive. If the value of Gt is larger than a specified Lt or Lte, the
     // range is reversed.
     optional uint64 gt = 4;
+}
+
+// StringRules describe the constraints applied to `string` values
+message StringRules {
+    // MinLen specifies that this field must be the specified number of
+    // characters (Unicode code points) at a minimum. Note that the number of
+    // characters may differ from the number of bytes in the string.
+    optional uint64 min_len = 2;
+
+    // MaxLen specifies that this field must be the specified number of
+    // characters (Unicode code points) at a maximum. Note that the number of
+    // characters may differ from the number of bytes in the string.
+    optional uint64 max_len = 3;
 }
 
 // RepeatedRules describe the constraints applied to `repeated` values
