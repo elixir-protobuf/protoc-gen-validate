@@ -18,12 +18,15 @@ message Phone {
 }
 
 message User {
-  uint64 id    = 1 [(validate.rules) = {
+  uint64 id = 1 [(validate.rules) = {
     uint64: {gt: 0, lt: 90},
     message: {required: true}
   }];
 
-  string email = 2 [(validate.rules).message.required = true];
+  string email = 2 [
+    (validate.rules).message.required = true,
+    (validate.rules).string = {min_len: 5, max_len: 30}
+  ];
 
   GENDER gender = 3;
 

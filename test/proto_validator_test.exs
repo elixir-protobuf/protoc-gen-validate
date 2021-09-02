@@ -195,4 +195,33 @@ defmodule ProtoValidator.ProtoValidatorTest do
                ProtoValidator.validate(user)
     end
   end
+
+  test "validate string data" do
+    user = %Examplepb.User{
+      id: 10,
+      email: "test@example",
+      phones: [
+        %Examplepb.Phone{
+          phone_number: 1888
+        }
+      ]
+    }
+
+    assert :ok = ProtoValidator.validate(user)
+
+    user = %{user | email: "1"}
+
+    assert {:error, "Invalid email, length must be at least 5"} = ProtoValidator.validate(user)
+
+    user = %{user | email: "1234567890123456789012345678901"}
+
+    assert {:error, "Invalid email, length must be at most 30"} = ProtoValidator.validate(user)
+
+    user = %{user | email: "あいうえお"}
+    assert :ok = ProtoValidator.validate(user)
+
+    user = %{user | email: "あいうえ"}
+
+    assert {:error, "Invalid email, length must be at least 5"} = ProtoValidator.validate(user)
+  end
 end

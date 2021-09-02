@@ -93,6 +93,14 @@ defmodule ProtoValidator.Validator.Vex do
     {Vex.Validators.Number, [less_than: v, message: "should less than #{v}"]}
   end
 
+  defp translate_rule({_, {:min_len, v}}) do
+    {Vex.Validators.Length, [min: v, message: "length must be at least #{v}"]}
+  end
+
+  defp translate_rule({_, {:max_len, v}}) do
+    {Vex.Validators.Length, [max: v, message: "length must be at most #{v}"]}
+  end
+
   defp translate_rule({:required, true}) do
     {:function, {ProtoValidator.Validator, :validate_required}}
   end
