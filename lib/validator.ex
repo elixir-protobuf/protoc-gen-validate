@@ -15,6 +15,9 @@ defmodule ProtoValidator.Validator do
     if Enum.uniq(value) == value, do: :ok, else: {:error, "values should be uniq"}
   end
 
+  def validate_required(nil), do: {:error, "value is required"}
+  def validate_required(_value), do: :ok
+
   @doc """
   Validate the type of a field
   """

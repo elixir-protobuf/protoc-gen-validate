@@ -94,7 +94,7 @@ defmodule ProtoValidator.Validator.Vex do
   end
 
   defp translate_rule({:required, true}) do
-    {Vex.Validators.Presence, [message: "should exists"]}
+    {:function, {ProtoValidator.Validator, :validate_required}}
   end
 
   defp translate_rule({:repeated, {:items, rule}}) do
