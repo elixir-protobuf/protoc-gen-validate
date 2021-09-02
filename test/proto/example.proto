@@ -10,6 +10,13 @@ enum GENDER {
   OTHER = 2;
 }
 
+message Phone {
+  uint64 phone_number = 1 [(validate.rules) = {
+    uint64: {gt: 1000, lt: 2000},
+    message: {required: true}
+  }];
+}
+
 message User {
   uint64 id    = 1 [(validate.rules) = {
     uint64: {gt: 0, lt: 90},
@@ -19,13 +26,6 @@ message User {
   string email = 2 [(validate.rules).message.required = true];
 
   GENDER gender = 3;
-
-  message Phone {
-    uint64 phone_number = 1 [(validate.rules) = {
-      uint64: {gt: 1000, lt: 2000}, 
-      message: {required: true}
-    }];
-  }
 
   repeated Phone phones = 4 [(validate.rules).repeated.min_items = 1];
 
