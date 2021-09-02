@@ -8,11 +8,12 @@ defmodule Validate.FieldRules do
         }
   defstruct [:type, :message]
 
-  oneof(:type, 0)
+  oneof :type, 0
 
-  field(:message, 17, optional: true, type: Validate.MessageRules)
-  field(:uint64, 6, optional: true, type: Validate.UInt64Rules, oneof: 0)
-  field(:repeated, 18, optional: true, type: Validate.RepeatedRules, oneof: 0)
+  field :message, 17, optional: true, type: Validate.MessageRules
+  field :uint64, 6, optional: true, type: Validate.UInt64Rules, oneof: 0
+  field :string, 14, optional: true, type: Validate.StringRules, oneof: 0
+  field :repeated, 18, optional: true, type: Validate.RepeatedRules, oneof: 0
 end
 
 defmodule Validate.MessageRules do
@@ -24,7 +25,7 @@ defmodule Validate.MessageRules do
         }
   defstruct [:required]
 
-  field(:required, 2, optional: true, type: :bool)
+  field :required, 2, optional: true, type: :bool
 end
 
 defmodule Validate.UInt64Rules do
@@ -37,8 +38,22 @@ defmodule Validate.UInt64Rules do
         }
   defstruct [:lt, :gt]
 
-  field(:lt, 2, optional: true, type: :uint64)
-  field(:gt, 4, optional: true, type: :uint64)
+  field :lt, 2, optional: true, type: :uint64
+  field :gt, 4, optional: true, type: :uint64
+end
+
+defmodule Validate.StringRules do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          min_len: non_neg_integer,
+          max_len: non_neg_integer
+        }
+  defstruct [:min_len, :max_len]
+
+  field :min_len, 2, optional: true, type: :uint64
+  field :max_len, 3, optional: true, type: :uint64
 end
 
 defmodule Validate.RepeatedRules do
@@ -53,15 +68,15 @@ defmodule Validate.RepeatedRules do
         }
   defstruct [:min_items, :max_items, :unique, :items]
 
-  field(:min_items, 1, optional: true, type: :uint64)
-  field(:max_items, 2, optional: true, type: :uint64)
-  field(:unique, 3, optional: true, type: :bool)
-  field(:items, 4, optional: true, type: Validate.FieldRules)
+  field :min_items, 1, optional: true, type: :uint64
+  field :max_items, 2, optional: true, type: :uint64
+  field :unique, 3, optional: true, type: :bool
+  field :items, 4, optional: true, type: Validate.FieldRules
 end
 
 defmodule Validate.PbExtension do
   @moduledoc false
   use Protobuf, syntax: :proto2
 
-  extend(Google.Protobuf.FieldOptions, :rules, 1071, optional: true, type: Validate.FieldRules)
+  extend Google.Protobuf.FieldOptions, :rules, 1071, optional: true, type: Validate.FieldRules
 end
