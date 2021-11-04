@@ -19,3 +19,10 @@ defmodule ProtoValidator.Gen.Examplepb.User do
     repeated: [items: [uint64: [gt: 0, lt: 90]], min_items: 0, unique: true]
   )
 end
+
+defmodule ProtoValidator.Gen.Examplepb.Foo do
+  @moduledoc false
+  use ProtoValidator, entity: Examplepb.Foo
+
+  validate(:int32, type: :int32, int32: [gte: 0, lte: 10])
+end

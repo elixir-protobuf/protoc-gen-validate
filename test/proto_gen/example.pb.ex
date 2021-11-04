@@ -43,3 +43,16 @@ defmodule Examplepb.User do
   field :phones, 4, repeated: true, type: Examplepb.Phone
   field :following_ids, 5, repeated: true, type: :uint64, json_name: "followingIds"
 end
+
+defmodule Examplepb.Foo do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          int32: integer
+        }
+
+  defstruct [:int32]
+
+  field :int32, 1, type: :int32
+end
