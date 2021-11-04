@@ -224,4 +224,16 @@ defmodule ProtoValidator.ProtoValidatorTest do
 
     assert {:error, "Invalid email, length must be at least 5"} = ProtoValidator.validate(user)
   end
+
+  test "validate integer gte, lte rules" do
+    assert :ok = ProtoValidator.validate(%Examplepb.Foo{int32: 0})
+
+    assert {:error, "Invalid int32, should greater than or equal to 0"} =
+             ProtoValidator.validate(%Examplepb.Foo{int32: -1})
+
+    assert :ok = ProtoValidator.validate(%Examplepb.Foo{int32: 10})
+
+    assert {:error, "Invalid int32, should less than or equal to 10"} =
+             ProtoValidator.validate(%Examplepb.Foo{int32: 11})
+  end
 end

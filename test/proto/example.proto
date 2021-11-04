@@ -38,3 +38,9 @@ message User {
     items: {uint64: {gt: 0, lt: 90}}
   }];
 }
+
+message Foo {
+  int32 int32 = 1 [(validate.rules) = {
+    int32: {gte: 0, lte: 10}
+  }];
+}

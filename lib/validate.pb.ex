@@ -11,9 +11,28 @@ defmodule Validate.FieldRules do
   oneof :type, 0
 
   field :message, 17, optional: true, type: Validate.MessageRules
+  field :int32, 3, optional: true, type: Validate.Int32Rules, oneof: 0
   field :uint64, 6, optional: true, type: Validate.UInt64Rules, oneof: 0
   field :string, 14, optional: true, type: Validate.StringRules, oneof: 0
   field :repeated, 18, optional: true, type: Validate.RepeatedRules, oneof: 0
+end
+
+defmodule Validate.Int32Rules do
+  @moduledoc false
+  use Protobuf, syntax: :proto2
+
+  @type t :: %__MODULE__{
+          lt: integer,
+          lte: integer,
+          gt: integer,
+          gte: integer
+        }
+  defstruct [:lt, :lte, :gt, :gte]
+
+  field :lt, 2, optional: true, type: :int32
+  field :lte, 3, optional: true, type: :int32
+  field :gt, 4, optional: true, type: :int32
+  field :gte, 5, optional: true, type: :int32
 end
 
 defmodule Validate.MessageRules do
@@ -34,12 +53,16 @@ defmodule Validate.UInt64Rules do
 
   @type t :: %__MODULE__{
           lt: non_neg_integer,
-          gt: non_neg_integer
+          lte: non_neg_integer,
+          gt: non_neg_integer,
+          gte: non_neg_integer
         }
-  defstruct [:lt, :gt]
+  defstruct [:lt, :lte, :gt, :gte]
 
   field :lt, 2, optional: true, type: :uint64
+  field :lte, 3, optional: true, type: :uint64
   field :gt, 4, optional: true, type: :uint64
+  field :gte, 5, optional: true, type: :uint64
 end
 
 defmodule Validate.StringRules do

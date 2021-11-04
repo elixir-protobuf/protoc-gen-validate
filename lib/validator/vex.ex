@@ -89,8 +89,18 @@ defmodule ProtoValidator.Validator.Vex do
     {Vex.Validators.Number, [greater_than: v, message: "should greater than #{v}"]}
   end
 
+  defp translate_rule({_, {:gte, v}}) do
+    {Vex.Validators.Number,
+     [greater_than_or_equal_to: v, message: "should greater than or equal to #{v}"]}
+  end
+
   defp translate_rule({_, {:lt, v}}) do
     {Vex.Validators.Number, [less_than: v, message: "should less than #{v}"]}
+  end
+
+  defp translate_rule({_, {:lte, v}}) do
+    {Vex.Validators.Number,
+     [less_than_or_equal_to: v, message: "should less than or equal to #{v}"]}
   end
 
   defp translate_rule({_, {:min_len, v}}) do
