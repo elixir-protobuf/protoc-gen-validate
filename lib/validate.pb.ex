@@ -1,12 +1,6 @@
 defmodule Validate.FieldRules do
   @moduledoc false
-  use Protobuf, syntax: :proto2
-
-  @type t :: %__MODULE__{
-          type: {atom, any},
-          message: Validate.MessageRules.t() | nil
-        }
-  defstruct [:type, :message]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   oneof :type, 0
 
@@ -19,15 +13,7 @@ end
 
 defmodule Validate.Int32Rules do
   @moduledoc false
-  use Protobuf, syntax: :proto2
-
-  @type t :: %__MODULE__{
-          lt: integer,
-          lte: integer,
-          gt: integer,
-          gte: integer
-        }
-  defstruct [:lt, :lte, :gt, :gte]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :lt, 2, optional: true, type: :int32
   field :lte, 3, optional: true, type: :int32
@@ -37,27 +23,14 @@ end
 
 defmodule Validate.MessageRules do
   @moduledoc false
-  use Protobuf, syntax: :proto2
-
-  @type t :: %__MODULE__{
-          required: boolean
-        }
-  defstruct [:required]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :required, 2, optional: true, type: :bool
 end
 
 defmodule Validate.UInt64Rules do
   @moduledoc false
-  use Protobuf, syntax: :proto2
-
-  @type t :: %__MODULE__{
-          lt: non_neg_integer,
-          lte: non_neg_integer,
-          gt: non_neg_integer,
-          gte: non_neg_integer
-        }
-  defstruct [:lt, :lte, :gt, :gte]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :lt, 2, optional: true, type: :uint64
   field :lte, 3, optional: true, type: :uint64
@@ -67,13 +40,7 @@ end
 
 defmodule Validate.StringRules do
   @moduledoc false
-  use Protobuf, syntax: :proto2
-
-  @type t :: %__MODULE__{
-          min_len: non_neg_integer,
-          max_len: non_neg_integer
-        }
-  defstruct [:min_len, :max_len]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :min_len, 2, optional: true, type: :uint64
   field :max_len, 3, optional: true, type: :uint64
@@ -81,15 +48,7 @@ end
 
 defmodule Validate.RepeatedRules do
   @moduledoc false
-  use Protobuf, syntax: :proto2
-
-  @type t :: %__MODULE__{
-          min_items: non_neg_integer,
-          max_items: non_neg_integer,
-          unique: boolean,
-          items: Validate.FieldRules.t() | nil
-        }
-  defstruct [:min_items, :max_items, :unique, :items]
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   field :min_items, 1, optional: true, type: :uint64
   field :max_items, 2, optional: true, type: :uint64
@@ -99,7 +58,7 @@ end
 
 defmodule Validate.PbExtension do
   @moduledoc false
-  use Protobuf, syntax: :proto2
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
   extend Google.Protobuf.FieldOptions, :rules, 1071, optional: true, type: Validate.FieldRules
 end

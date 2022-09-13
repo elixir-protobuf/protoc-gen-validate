@@ -14,15 +14,17 @@ defmodule ProtoValidator.Protoc.CLI do
 
   def main(_) do
     :io.setopts(:standard_io, encoding: :latin1)
+    Protobuf.load_extensions()
+
     bin = IO.binread(:all)
     request = Protobuf.Decoder.decode(bin, Google.Protobuf.Compiler.CodeGeneratorRequest)
 
     ctx =
-      %Protobuf.Protoc.Context{}
-      |> Protobuf.Protoc.CLI.find_types(request.proto_file)
-
-    # debug
-    # raise inspect(ctx, limit: :infinity)
+      Protobuf.Protoc.CLI.find_types(
+        %Protobuf.Protoc.Context{},
+        request.proto_file,
+        request.file_to_generate
+      )
 
     files =
       request.proto_file

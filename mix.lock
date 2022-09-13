@@ -1,4 +1,6 @@
 %{
-  "protobuf": {:hex, :protobuf, "0.8.0-beta.1", "16a041f5c31f1598fe87cd53823a3aa76201c312ba9a766fd5b53a0f348b9986", [:mix], [], "hexpm", "d7d92dd3d80d04bee771ffd4fbfea197272e54fd310507b87326299ad660607f"},
-  "vex": {:hex, :vex, "0.8.0", "0a04e3aebe5ec443525c88f3833b4481d97de272f891243b62b18efbda85b121", [:mix], [], "hexpm", "36a37f264b36fe4b0430c9f174d71c59845cf56d9e2ae32960038432b16961ea"},
+  "google_protobuf": {:git, "https://github.com/protocolbuffers/protobuf.git", "fcd26beabe034142c0f1a693f7cb6e1517b03de3", [branch: "main", submodules: true]},
+  "google_protos": {:hex, :google_protos, "0.2.0", "7c6280e288d7f04a58448444b12d937ddc8cc40dc3d1e4f61c69936ef71d4739", [:mix], [{:protobuf, "~> 0.8", [hex: :protobuf, repo: "hexpm", optional: false]}], "hexpm", "5de24802e89867cea544d0ee8cbd36f6c9c1ebd4a9fcc55276d6eeadeedcc1f5"},
+  "protobuf": {:hex, :protobuf, "0.11.0", "58d5531abadea3f71135e97bd214da53b21adcdb5b1420aee63f4be8173ec927", [:mix], [{:jason, "~> 1.2", [hex: :jason, repo: "hexpm", optional: true]}], "hexpm", "30ad9a867a5c5a0616cac9765c4d2c2b7b0030fa81ea6d0c14c2eb5affb6ac52"},
+  "vex": {:hex, :vex, "0.9.0", "613ea5eb3055662e7178b83e25b2df0975f68c3d8bb67c1645f0573e1a78d606", [:mix], [], "hexpm", "c69fff44d5c8aa3f1faee71bba1dcab05dd36364c5a629df8bb11751240c857f"},
 }

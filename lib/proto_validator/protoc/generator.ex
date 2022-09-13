@@ -22,7 +22,7 @@ defmodule ProtoValidator.Protoc.Generator do
 
   defp generate_content(ctx, desc) do
     ctx = %{ctx | package: desc.package || ""}
-    ctx = Protobuf.Protoc.Context.cal_file_options(ctx, desc.options)
+    ctx = Protobuf.Protoc.Context.custom_file_options_from_file_desc(ctx, desc)
 
     type_mappings =
       for {_file_name, mappings} <- ctx.global_type_mapping,
@@ -42,7 +42,7 @@ defmodule ProtoValidator.Protoc.Generator do
       validations ->
         validations
         |> Enum.join("\n")
-        |> Protobuf.Protoc.Generator.format_code()
+        |> Protobuf.Protoc.Generator.Util.format()
     end
   end
 
@@ -106,7 +106,7 @@ defmodule ProtoValidator.Protoc.Generator do
     get_type_name(type, type_name, type_mappings)
   end
 
-  defp get_type_name(type, nil, _type_mappings), do: ":#{Protobuf.TypeUtil.from_enum(type)}"
+  defp get_type_name(type, nil, _type_mappings), do: ":#{ProtoValidator.Protoc.Utils.from_enum(type)}"
 
   defp get_type_name(_type, type_name, type_mappings) do
     <<?., fqn::binary>> = type_name

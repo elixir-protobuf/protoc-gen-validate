@@ -1,6 +1,3 @@
-use Mix.Config
-
-config :protobuf,
-  extensions: :enabled
+import Mix.Config
 
 config :proto_validator, validator: :vex

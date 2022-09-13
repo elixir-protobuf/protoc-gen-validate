@@ -10,7 +10,7 @@ defmodule ProtoValidator.Gen.Examplepb.User do
   use ProtoValidator, entity: Examplepb.User
 
   validate(:id, type: :uint64, required: true, uint64: [gt: 0, lt: 90])
-  validate(:email, type: :string, string: [max_len: 30, min_len: 5])
+  validate(:email, type: :string, required: true, string: [max_len: 30, min_len: 5])
   validate(:gender, type: Examplepb.GENDER)
   validate(:phones, type: {:repeated, Examplepb.Phone}, repeated: [min_items: 1])
 
