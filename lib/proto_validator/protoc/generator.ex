@@ -106,7 +106,8 @@ defmodule ProtoValidator.Protoc.Generator do
     get_type_name(type, type_name, type_mappings)
   end
 
-  defp get_type_name(type, nil, _type_mappings), do: ":#{ProtoValidator.Protoc.Utils.from_enum(type)}"
+  defp get_type_name(type, nil, _type_mappings),
+    do: ":#{ProtoValidator.Protoc.Utils.from_enum(type)}"
 
   defp get_type_name(_type, type_name, type_mappings) do
     <<?., fqn::binary>> = type_name

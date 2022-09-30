@@ -1,5 +1,5 @@
 defmodule ProtoValidator.Validator do
-  @validator Application.get_env(:proto_validator, :validator, :vex)
+  @validator Application.compile_env(:proto_validator, :validator, :vex)
 
   import ProtoValidator.Utils, only: [pipe_validates: 2]
 
