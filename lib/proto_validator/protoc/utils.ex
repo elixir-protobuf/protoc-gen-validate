@@ -54,6 +54,10 @@ defmodule ProtoValidator.Protoc.Utils do
         {k, v} when is_tuple(v) ->
           "#{k}: [#{get_rule_str(v)}]"
 
+        {k, v} when is_binary(v) ->
+          IO.puts(:stderr, "#{k}: \"#{get_rule_str(v)}\"")
+          "#{k}: \"#{get_rule_str(v)}\""
+
         {k, v} ->
           "#{k}: #{get_rule_str(v)}"
       end)

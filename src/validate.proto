@@ -70,6 +70,9 @@ message UInt64Rules {
 
 // StringRules describe the constraints applied to `string` values
 message StringRules {
+    // Const specifies that this field must be exactly the specified value
+    optional string const = 1;
+
     // MinLen specifies that this field must be the specified number of
     // characters (Unicode code points) at a minimum. Note that the number of
     // characters may differ from the number of bytes in the string.
