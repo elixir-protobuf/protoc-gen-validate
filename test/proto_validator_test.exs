@@ -236,4 +236,85 @@ defmodule ProtoValidator.ProtoValidatorTest do
     assert {:error, "Invalid int32, should less than or equal to 10"} =
              ProtoValidator.validate(%Examplepb.Foo{int32: 11})
   end
+
+  describe "validate string uuid rule" do
+    test "should be valid with a nil uuid" do
+      assert :ok =
+               ProtoValidator.validate(%Examplepb.Bar{
+                 uuid: "00000000-0000-0000-0000-000000000000"
+               })
+    end
+
+    test "should be valid with a v1 uuid" do
+      assert :ok =
+               ProtoValidator.validate(%Examplepb.Bar{
+                 uuid: "b45c0c80-8880-11e9-a5b1-000000000000"
+               })
+
+      assert :ok =
+               ProtoValidator.validate(%Examplepb.Bar{
+                 uuid: "B45C0C80-8880-11E9-A5B1-000000000000"
+               })
+    end
+
+    test "should be valid with a v2 uuid" do
+      assert :ok =
+               ProtoValidator.validate(%Examplepb.Bar{
+                 uuid: "b45c0c80-8880-21e9-a5b1-000000000000"
+               })
+
+      assert :ok =
+               ProtoValidator.validate(%Examplepb.Bar{
+                 uuid: "B45C0C80-8880-21E9-A5B1-000000000000"
+               })
+    end
+
+    test "should be valid with a v3 uuid" do
+      assert :ok =
+               ProtoValidator.validate(%Examplepb.Bar{
+                 uuid: "a3bb189e-8bf9-3888-9912-ace4e6543002"
+               })
+
+      assert :ok =
+               ProtoValidator.validate(%Examplepb.Bar{
+                 uuid: "A3BB189E-8BF9-3888-9912-ACE4E6543002"
+               })
+    end
+
+    test "should be valid with a v4 uuid" do
+      assert :ok =
+               ProtoValidator.validate(%Examplepb.Bar{
+                 uuid: "8b208305-00e8-4460-a440-5e0dcd83bb0a"
+               })
+
+      assert :ok =
+               ProtoValidator.validate(%Examplepb.Bar{
+                 uuid: "8B208305-00E8-4460-A440-5E0DCD83BB0A"
+               })
+    end
+
+    test "should be valid with a v5 uuid" do
+      assert :ok =
+               ProtoValidator.validate(%Examplepb.Bar{
+                 uuid: "a6edc906-2f9f-5fb2-a373-efac406f0ef2"
+               })
+
+      assert :ok =
+               ProtoValidator.validate(%Examplepb.Bar{
+                 uuid: "A6EDC906-2F9F-5FB2-A373-EFAC406F0EF2"
+               })
+    end
+
+    test "should be invalid with a non-uuid string" do
+      assert {:error, "Invalid uuid, must be a valid UUID string in default format"} =
+               ProtoValidator.validate(%Examplepb.Bar{uuid: "invalid"})
+    end
+
+    test "should be invalid with a bad uuid" do
+      assert {:error, "Invalid uuid, must be a valid UUID string in default format"} =
+               ProtoValidator.validate(%Examplepb.Bar{
+                 uuid: "ffffffff-ffff-ffff-ffff-fffffffffffff"
+               })
+    end
+  end
 end

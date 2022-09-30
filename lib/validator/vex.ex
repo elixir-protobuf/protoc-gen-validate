@@ -131,5 +131,11 @@ defmodule ProtoValidator.Validator.Vex do
     {:function, {ProtoValidator.Validator, :validate_uniq}}
   end
 
-  defp translate_rule(_), do: nil
+  defp translate_rule({:string, {:well_known, {:uuid, true}}}) do
+    {Vex.Validators.Uuid, [format: :default]}
+  end
+
+  defp translate_rule(_) do
+    nil
+  end
 end

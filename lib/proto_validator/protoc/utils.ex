@@ -45,14 +45,26 @@ defmodule ProtoValidator.Protoc.Utils do
     rule_str =
       rules
       |> Enum.map(fn
-        {_k, nil} -> nil
-        {k, v} when is_map(v) -> "#{k}: [#{get_rule_str(v)}]"
-        {k, v} -> "#{k}: #{get_rule_str(v)}"
+        {_k, nil} ->
+          nil
+
+        {k, v} when is_map(v) ->
+          "#{k}: [#{get_rule_str(v)}]"
+
+        {k, v} when is_tuple(v) ->
+          "#{k}: [#{get_rule_str(v)}]"
+
+        {k, v} ->
+          "#{k}: #{get_rule_str(v)}"
       end)
       |> Enum.reject(&is_nil/1)
       |> Enum.join(", ")
 
     "#{rule_str}"
+  end
+
+  def get_rule_str({type, type_rules}) when is_boolean(type_rules) do
+    "#{type}: #{get_rule_str(type_rules)}"
   end
 
   def get_rule_str({type, type_rules}) do

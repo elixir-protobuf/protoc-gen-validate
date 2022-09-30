@@ -26,3 +26,10 @@ defmodule ProtoValidator.Gen.Examplepb.Foo do
 
   validate(:int32, type: :int32, int32: [gte: 0, lte: 10])
 end
+
+defmodule ProtoValidator.Gen.Examplepb.Bar do
+  @moduledoc false
+  use ProtoValidator, entity: Examplepb.Bar
+
+  validate(:uuid, type: :string, string: [well_known: [uuid: true]])
+end

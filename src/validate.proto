@@ -79,6 +79,18 @@ message StringRules {
     // characters (Unicode code points) at a maximum. Note that the number of
     // characters may differ from the number of bytes in the string.
     optional uint64 max_len = 3;
+
+
+
+    // WellKnown rules provide advanced constraints against common string
+    // patterns
+    oneof well_known {
+
+
+        // Uuid specifies that the field must be a valid UUID as defined by
+        // RFC 4122
+        bool uuid     = 22;
+    }
 }
 
 // RepeatedRules describe the constraints applied to `repeated` values

@@ -42,8 +42,11 @@ defmodule Validate.StringRules do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto2
 
+  oneof :well_known, 0
+
   field :min_len, 2, optional: true, type: :uint64
   field :max_len, 3, optional: true, type: :uint64
+  field :uuid, 22, optional: true, type: :bool, oneof: 0
 end
 
 defmodule Validate.RepeatedRules do
