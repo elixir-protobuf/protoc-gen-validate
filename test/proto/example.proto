@@ -27,6 +27,7 @@ message User {
     (validate.rules).message.required = true,
     (validate.rules).string = {min_len: 5, max_len: 30}
   ];
+  
 
   GENDER gender = 3;
 
@@ -47,4 +48,10 @@ message Foo {
 
 message Bar {
   string uuid = 1 [(validate.rules).string.uuid = true];
+}
+
+message Baz {
+  string name = 1 [
+    (validate.rules).string.const = "foo"
+  ];
 }
