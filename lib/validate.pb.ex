@@ -44,6 +44,7 @@ defmodule Validate.StringRules do
 
   oneof :well_known, 0
 
+  field :const, 1, optional: true, type: :string
   field :min_len, 2, optional: true, type: :uint64
   field :max_len, 3, optional: true, type: :uint64
   field :uuid, 22, optional: true, type: :bool, oneof: 0
