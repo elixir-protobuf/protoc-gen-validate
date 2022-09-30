@@ -318,20 +318,19 @@ defmodule ProtoValidator.ProtoValidatorTest do
     end
   end
 
-
   describe "validate string const rule" do
     test "should be valid when the value is the same as the declared const" do
       assert :ok =
-        ProtoValidator.validate(%Examplepb.Baz{
-          name: "foo"
-        })
+               ProtoValidator.validate(%Examplepb.Baz{
+                 name: "foo"
+               })
     end
 
     test "should be invalid when the value is different as the declared const" do
       assert {:error, "Invalid name, value should be foo"} =
-        ProtoValidator.validate(%Examplepb.Baz{
-          name: "bar"
-        })
+               ProtoValidator.validate(%Examplepb.Baz{
+                 name: "bar"
+               })
     end
   end
 end
