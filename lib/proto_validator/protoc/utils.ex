@@ -48,6 +48,10 @@ defmodule ProtoValidator.Protoc.Utils do
         {_k, nil} ->
           nil
 
+        # drop empty lists, treat them as zero values, like the previous nil clause
+        {_k, v} when is_list(v) and length(v) == 0 ->
+          nil
+
         {k, v} when is_map(v) ->
           "#{k}: [#{get_rule_str(v)}]"
 
@@ -55,6 +59,9 @@ defmodule ProtoValidator.Protoc.Utils do
           "#{k}: [#{get_rule_str(v)}]"
 
         {k, v} when k == :pattern ->
+          "#{k}: #{Kernel.inspect(v)}"
+
+        {k, v} when is_list(v) ->
           "#{k}: #{Kernel.inspect(v)}"
 
         {k, v} when is_binary(v) ->
