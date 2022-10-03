@@ -53,6 +53,7 @@ defmodule ProtoValidator.Protoc.Generator do
 
       validations ->
         {entity, validate_name} = get_message_name(ctx, type_mappings, desc)
+
         option_str = get_options_str(%{entity: entity})
         ProtoValidator.Protoc.Template.message(validate_name, option_str, validations)
     end

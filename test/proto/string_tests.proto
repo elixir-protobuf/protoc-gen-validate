@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package stringtests;
+
+import "validate.proto";
+
+message Foo {
+  int32 int32 = 1 [ (validate.rules) = {int32 : {gte : 0, lte : 10}} ];
+}
+
+message Bar {
+  string uuid = 1
+      [ (validate.rules).string = {uuid : true, ignore_empty : true} ];
+}
+
+message Baz { string name = 1 [ (validate.rules).string.const = "foo" ]; }
+message BazLen { string name = 1 [ (validate.rules).string.len = 3 ]; }
+message BazLenBytes {
+  string name = 1 [ (validate.rules).string.len_bytes = 4 ];
+}
+message BazLenBytesMin {
+  string name = 1 [ (validate.rules).string.min_bytes = 4 ];
+}
+message BazLenBytesMax {
+  string name = 1 [ (validate.rules).string.max_bytes = 8 ];
+}
+
+message BazLenBytesMinMax {
+  string name = 1 [ (validate.rules).string = {min_bytes : 4, max_bytes : 8} ];
+}
+
+message StringEqualMinMaxBytes {
+  string val = 1 [ (validate.rules).string = {min_bytes : 4, max_bytes : 4} ];
+}
+
+message StringPattern {
+  string val = 1 [ (validate.rules).string.pattern = "(?i)^[a-z0-9]+$" ];
+}
+
+message StringPatternEscapes {
+  string val = 1 [ (validate.rules).string.pattern = "\\* \\\\ \\w" ];
+}
+
+message StringPrefix {
+  string val = 1 [ (validate.rules).string.prefix = "foo" ];
+}
+
+message StringSuffix {
+  string val = 1 [ (validate.rules).string.suffix = "baz" ];
+}
+
+message StringContains {
+  string val = 1 [ (validate.rules).string.contains = "bar" ];
+}
+
+message StringNotContains {
+  string val = 1 [ (validate.rules).string.not_contains = "bar" ];
+}

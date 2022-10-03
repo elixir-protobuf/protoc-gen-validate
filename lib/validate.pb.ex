@@ -47,7 +47,17 @@ defmodule Validate.StringRules do
   field :const, 1, optional: true, type: :string
   field :min_len, 2, optional: true, type: :uint64
   field :max_len, 3, optional: true, type: :uint64
+  field :len, 19, optional: true, type: :uint64
+  field :len_bytes, 20, optional: true, type: :uint64
+  field :min_bytes, 4, optional: true, type: :uint64
+  field :max_bytes, 5, optional: true, type: :uint64
+  field :pattern, 6, optional: true, type: :string
+  field :prefix, 7, optional: true, type: :string
+  field :suffix, 8, optional: true, type: :string
+  field :contains, 9, optional: true, type: :string
+  field :not_contains, 23, optional: true, type: :string
   field :uuid, 22, optional: true, type: :bool, oneof: 0
+  field :ignore_empty, 26, optional: true, type: :bool
 end
 
 defmodule Validate.RepeatedRules do

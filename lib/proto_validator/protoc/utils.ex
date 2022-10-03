@@ -54,8 +54,10 @@ defmodule ProtoValidator.Protoc.Utils do
         {k, v} when is_tuple(v) ->
           "#{k}: [#{get_rule_str(v)}]"
 
+        {k, v} when k == :pattern ->
+          "#{k}: #{Kernel.inspect(v)}"
+
         {k, v} when is_binary(v) ->
-          IO.puts(:stderr, "#{k}: \"#{get_rule_str(v)}\"")
           "#{k}: \"#{get_rule_str(v)}\""
 
         {k, v} ->
@@ -75,7 +77,9 @@ defmodule ProtoValidator.Protoc.Utils do
     "#{type}: [#{get_rule_str(type_rules)}]"
   end
 
-  def get_rule_str(v), do: to_string(v)
+  def get_rule_str(v) do
+    to_string(v)
+  end
 
   @doc """
   Get type name string
