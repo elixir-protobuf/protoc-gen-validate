@@ -74,25 +74,41 @@ defmodule ProtoValidator.Validator.Vex do
     flattened_rules = flatten_rules(rules)
 
     flattened_rules
-    |> Enum.map(&translate_rule(&1, flattened_rules))
+    |> Enum.map(fn element ->
+      translate_rule(element, flattened_rules)
+    end)
     |> Enum.reject(&is_nil/1)
   end
 
+  def flatten_rules([{_, arg}] = rule) do
+    if Keyword.keyword?(arg) do
+      flat_rules(rule)
+    else
+      rule
+    end
+  end
+
   def flatten_rules(rules) when is_list(rules) do
+    flat_rules(rules)
+  end
+
+  def flatten_rules(rules), do: rules
+
+  defp flat_rules(rules) do
     rules
     |> Enum.map(fn
       {k, rules} when is_list(rules) ->
         rules
         |> flatten_rules()
-        |> Enum.map(fn rule -> {k, rule} end)
+        |> Enum.map(fn rule ->
+          {k, rule}
+        end)
 
       rule ->
         rule
     end)
     |> List.flatten()
   end
-
-  def flatten_rules(rules), do: rules
 
   defp translate_rule({_, {:gt, v}}, _context) do
     {Vex.Validators.Number, [greater_than: v, message: "should greater than #{v}"]}
@@ -182,6 +198,10 @@ defmodule ProtoValidator.Validator.Vex do
 
   defp translate_rule({:string, {:not_contains, v}}, _context) do
     {NotContains, [has_not: v, message: "should not contain #{v}"]}
+  end
+
+  defp translate_rule({:string, {:in, v}}, _context) do
+    {Vex.Validators.Inclusion, [in: v, message: "value should be oneof #{inspect(v)}"]}
   end
 
   defp translate_rule(_, _) do

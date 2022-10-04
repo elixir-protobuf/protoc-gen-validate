@@ -394,4 +394,20 @@ defmodule ProtoValidator.ProtoValidatorStringTest do
                })
     end
   end
+
+  describe "validate in rule" do
+    test "should pass when the value is allowed" do
+      assert :ok =
+               ProtoValidator.validate(%Stringtests.StringIn{
+                 val: "bar"
+               })
+    end
+
+    test "should not pass when the value is not allowed" do
+      assert {:error, "Invalid val, value should be oneof [\"bar\", \"baz2\"]"} =
+               ProtoValidator.validate(%Stringtests.StringIn{
+                 val: "quux"
+               })
+    end
+  end
 end

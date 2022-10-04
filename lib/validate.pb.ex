@@ -56,6 +56,7 @@ defmodule Validate.StringRules do
   field :suffix, 8, optional: true, type: :string
   field :contains, 9, optional: true, type: :string
   field :not_contains, 23, optional: true, type: :string
+  field :in, 10, repeated: true, type: :string
   field :uuid, 22, optional: true, type: :bool, oneof: 0
   field :ignore_empty, 26, optional: true, type: :bool
 end

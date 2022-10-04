@@ -102,3 +102,10 @@ defmodule ProtoValidator.Gen.Stringtests.StringNotContains do
 
   validate(:val, type: :string, string: [not_contains: "bar"])
 end
+
+defmodule ProtoValidator.Gen.Stringtests.StringIn do
+  @moduledoc false
+  use ProtoValidator, entity: Stringtests.StringIn
+
+  validate(:val, type: :string, string: [in: ["bar", "baz2"]])
+end

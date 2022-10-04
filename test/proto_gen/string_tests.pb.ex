@@ -102,3 +102,10 @@ defmodule Stringtests.StringNotContains do
 
   field :val, 1, type: :string, deprecated: false
 end
+
+defmodule Stringtests.StringIn do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+
+  field :val, 1, type: :string, deprecated: false
+end

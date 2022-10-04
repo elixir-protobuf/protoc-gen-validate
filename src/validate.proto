@@ -120,6 +120,10 @@ message StringRules {
   // anywhere in the string.
   optional string not_contains = 23;
 
+  // In specifies that this field must be equal to one of the specified
+  // values
+  repeated string in = 10;
+
   // WellKnown rules provide advanced constraints against common string
   // patterns
   oneof well_known {

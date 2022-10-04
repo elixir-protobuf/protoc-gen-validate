@@ -56,3 +56,7 @@ message StringContains {
 message StringNotContains {
   string val = 1 [ (validate.rules).string.not_contains = "bar" ];
 }
+
+message StringIn {
+  string val = 1 [ (validate.rules).string = {in : [ "bar", "baz2" ]} ];
+}
