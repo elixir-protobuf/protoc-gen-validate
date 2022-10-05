@@ -13,9 +13,10 @@ end
 ```
 
 ## Usage
+
 Developers import the ProtoValidator and annotate the messages and fields in their proto files with constraint rules:
 
-``` Elixir
+```Elixir
 package examplepb
 
 message User {
@@ -30,7 +31,7 @@ message User {
 
   message Phone {
     string phone_number = 1 [(validate.rules) = {
-      uint64: {gt: 1000, lt: 2000}, 
+      uint64: {gt: 1000, lt: 2000},
       message: {required: true}
     }];
   }
@@ -44,8 +45,10 @@ message User {
   }];
 }
 ```
+
 Then ProtoValidator will generate the validator modules for messages that have constraint rules automatically like:
-``` Elixir
+
+```Elixir
 defmodule ProtoValidator.Gen.Examplepb.User do
   @moduledoc false
   use ProtoValidator, entity: Examplepb.User
@@ -66,8 +69,10 @@ defmodule ProtoValidator.Gen.Examplepb.User.Phone do
   validate(:phone_number, required: true, uint64: [gt: 1000, lt: 2000])
 end
 ```
+
 Then both `&ProtoValidator.validate/1` and `&ProtoValidator.Gen.Examplepb.User/1` can be used to do the validation.
-``` Elixir
+
+```Elixir
 user = Examplepb.User.new()
 {:error, _} = ProtoValidator.validate(user)
 users = %{user | id: 1}
@@ -76,9 +81,12 @@ users = %{user | email: "user@example.com"}
 :ok = ProtoValidator.validate(user)
 :ok = ProtoValidator.Gen.Examplepb.User.validate(user)
 ```
+
 ## Notes
+
 Currently only those rules are supported:
-``` protobuf
+
+```protobuf
 message MessageRules {
     // Required specifies that this field must be set
     optional bool required = 2;
@@ -120,8 +128,8 @@ message RepeatedRules {
 Refer: https://github.com/envoyproxy/protoc-gen-validate
 
 1. Google's Protobuf messages(like google.protobuf.MessageOptions) are extended with
-validating rules(validate.proto)
+   validating rules(validate.proto)
 2. Your protobuf messages can use validate.proto to define validation options
 3. This plugin generate validating code when called by protoc. The code can be called
-to validate messages
+   to validate messages
 4. Then you can validate your structs

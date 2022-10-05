@@ -1,109 +1,102 @@
-defmodule Stringtests.Foo do
-  @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
-
-  field :int32, 1, type: :int32, deprecated: false
-end
-
-defmodule Stringtests.Bar do
+defmodule StringTest.Uuid do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :uuid, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.Baz do
+defmodule StringTest.Const do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :name, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.BazLen do
+defmodule StringTest.Len do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :name, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.BazLenBytes do
+defmodule StringTest.LenBytes do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :name, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.BazLenBytesMin do
+defmodule StringTest.MinBytes do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :name, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.BazLenBytesMax do
+defmodule StringTest.MaxBytes do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :name, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.BazLenBytesMinMax do
+defmodule StringTest.MinMaxBytes do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :name, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.StringEqualMinMaxBytes do
+defmodule StringTest.MinMaxBytesEqual do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :val, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.StringPattern do
+defmodule StringTest.Pattern do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :val, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.StringPatternEscapes do
+defmodule StringTest.PatternEscapes do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :val, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.StringPrefix do
+defmodule StringTest.Prefix do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :val, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.StringSuffix do
+defmodule StringTest.Suffix do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :val, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.StringContains do
+defmodule StringTest.Contains do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :val, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.StringNotContains do
+defmodule StringTest.NotContains do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   field :val, 1, type: :string, deprecated: false
 end
 
-defmodule Stringtests.StringIn do
+defmodule StringTest.In do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 

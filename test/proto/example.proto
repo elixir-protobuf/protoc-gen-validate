@@ -11,31 +11,34 @@ enum GENDER {
 }
 
 message Phone {
-  uint64 phone_number = 1 [(validate.rules) = {
-    uint64: {gt: 1000, lt: 2000},
-    message: {required: true}
-  }];
+  uint64 phone_number = 1 [ (validate.rules) = {
+    uint64 : {gt : 1000, lt : 2000},
+    message : {required : true}
+  } ];
 }
 
 message User {
-  uint64 id = 1 [(validate.rules) = {
-    uint64: {gt: 0, lt: 90},
-    message: {required: true}
-  }];
+  uint64 id = 1 [ (validate.rules) = {
+    uint64 : {gt : 0, lt : 90},
+    message : {required : true}
+  } ];
 
   string email = 2 [
     (validate.rules).message.required = true,
-    (validate.rules).string = {min_len: 5, max_len: 30}
+    (validate.rules).string = {min_len : 5, max_len : 30}
   ];
-  
 
   GENDER gender = 3;
 
-  repeated Phone phones = 4 [(validate.rules).repeated.min_items = 1];
+  repeated Phone phones = 4 [ (validate.rules).repeated .min_items = 1 ];
 
-  repeated uint64 following_ids = 5 [(validate.rules).repeated = {
-    min_items: 0,
-    unique: true,
-    items: {uint64: {gt: 0, lt: 90}}
-  }];
+  repeated uint64 following_ids = 5 [ (validate.rules).repeated = {
+    min_items : 0,
+    unique : true,
+    items : {uint64 : {gt : 0, lt : 90}}
+  } ];
+}
+
+message Foo {
+  int32 int32 = 1 [ (validate.rules) = {int32 : {gte : 0, lte : 10}} ];
 }
