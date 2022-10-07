@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package string_test;
+
+import "validate.proto";
+
+message Uuid {
+  string uuid = 1
+      [ (validate.rules).string = {uuid : true, ignore_empty : true} ];
+}
+
+message Const { string name = 1 [ (validate.rules).string.const = "foo" ]; }
+
+message Len { string name = 1 [ (validate.rules).string.len = 3 ]; }
+
+message LenBytes { string name = 1 [ (validate.rules).string.len_bytes = 4 ]; }
+
+message MinBytes { string name = 1 [ (validate.rules).string.min_bytes = 4 ]; }
+
+message MaxBytes { string name = 1 [ (validate.rules).string.max_bytes = 8 ]; }
+
+message MinMaxBytes {
+  string name = 1 [ (validate.rules).string = {min_bytes : 4, max_bytes : 8} ];
+}
+
+message MinMaxBytesEqual {
+  string val = 1 [ (validate.rules).string = {min_bytes : 4, max_bytes : 4} ];
+}
+
+message Pattern {
+  string val = 1 [ (validate.rules).string.pattern = "(?i)^[a-z0-9]+$" ];
+}
+
+message PatternEscapes {
+  string val = 1 [ (validate.rules).string.pattern = "\\* \\\\ \\w" ];
+}
+
+message Prefix { string val = 1 [ (validate.rules).string.prefix = "foo" ]; }
+
+message Suffix { string val = 1 [ (validate.rules).string.suffix = "baz" ]; }
+
+message Contains {
+  string val = 1 [ (validate.rules).string.contains = "bar" ];
+}
+
+message NotContains {
+  string val = 1 [ (validate.rules).string.not_contains = "bar" ];
+}
+
+message In {
+  string val = 1 [ (validate.rules).string = {in : [ "bar", "baz2" ]} ];
+}

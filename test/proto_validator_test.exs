@@ -1,6 +1,8 @@
 defmodule ProtoValidator.ProtoValidatorTest do
   use ExUnit.Case, async: true
 
+  # TODO: split using rules
+
   describe "all validate methods should work" do
     test "get :ok for valid struct" do
       user = %Examplepb.User{
@@ -193,6 +195,21 @@ defmodule ProtoValidator.ProtoValidatorTest do
 
       assert {:error, "Invalid following_ids, values should be uniq"} ==
                ProtoValidator.validate(user)
+    end
+  end
+
+  # TODO: split using rules
+  describe "validate integer rules" do
+    test "validate integer gte, lte rules" do
+      assert :ok = ProtoValidator.validate(%Examplepb.Foo{int32: 0})
+
+      assert {:error, "Invalid int32, should greater than or equal to 0"} =
+               ProtoValidator.validate(%Examplepb.Foo{int32: -1})
+
+      assert :ok = ProtoValidator.validate(%Examplepb.Foo{int32: 10})
+
+      assert {:error, "Invalid int32, should less than or equal to 10"} =
+               ProtoValidator.validate(%Examplepb.Foo{int32: 11})
     end
   end
 end
