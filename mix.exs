@@ -32,7 +32,9 @@ defmodule ProtoValidator.MixProject do
   defp deps do
     [
       {:protobuf, "~> 0.11.0"},
-      {:vex, "~> 0.9.0"}
+      {:vex, "~> 0.9.0"},
+      {:protoc_gen_validate,
+       github: "bufbuild/protoc-gen-validate", branch: "main", app: false, compile: false}
     ]
   end
 
